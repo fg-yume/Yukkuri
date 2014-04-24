@@ -1,10 +1,10 @@
-#Project-03
+#Project-02
 
-Third and final project for IGME-450 (Casual Game Development)
+Second and final project for IGME-450 (Casual Game Development)
 
 ##Authors
 * [Freddy Garcia] (https://github.com/fg-yume)
-* [Alex Mancillas]
+* [Alex Mancillas] (https://github.com/AlejandroMancillas)
 
 ##Specifications
 
