@@ -4,7 +4,7 @@ Third and final project for IGME-450 (Casual Game Development)
 
 ##Authors
 * [Freddy Garcia] (https://github.com/fg-yume)
-* [Elvis Perez] (https://github.com/starfishheat)
+* [Alex Mancillas]
 
 ##Specifications
 
