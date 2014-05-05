@@ -1,4 +1,4 @@
-#Project-02
+#Yukkuri
 
 Second and final project for IGME-450 (Casual Game Development)
 
