@@ -32,7 +32,7 @@ app.keydown = [];
 	queue.on("complete", complete, this);
 	queue.loadFile("js/lib/three.min.js");
 	queue.loadFile("js/lib/FirstPersonControls.js");
-	queue.loadFile("js/test.js");
+	queue.loadFile("js/water.js");
 	
 	function handleFileLoad(e){
 		console.log(e + " loaded");
