@@ -14,6 +14,7 @@ var Resources = {
 	materials	: new Array(),				// contains pre-built materials
 	geometries	: new Array(),				// contains pre-built geometries
 	textures	: new Array(),				// contains pre-built textures
+	objects		: new Array(),				// contains pre-built Object 3Ds
 	
 	/*
 	 * Returns the index of the materials array that matches the key being searched
@@ -25,6 +26,9 @@ var Resources = {
 	materialExists : function(key)
 	{
 		var i;
+		
+		// case insensitive
+		key = key.toLowerCase();
 	
 		for(i = 0; i < this.materials.length; i++)
 		{
@@ -47,6 +51,9 @@ var Resources = {
 	geometryExists : function(key)
 	{
 		var i;
+		
+		// case insensitive
+		key = key.toLowerCase();
 	
 		for(i = 0; i < this.geometries.length; i++)
 		{
@@ -70,10 +77,38 @@ var Resources = {
 	{
 		var i;
 		
+		// case insensitive
+		key = key.toLowerCase();
+		
 		for(i = 0; i < this.textures.length; i++)
 		{
 			// key exists
 			if(this.textures[i].key == key)
+				return i;
+		}
+		
+		// key doesn't exist
+		return -1;
+	},
+	
+	/*
+	 * Returns the index of the objects array that matches the key being searched
+	 *
+	 * @param	{String} key		the key of the object to search for
+	 *
+	 * @return	{Number}			the index that matches the key being searched. Returns -1 if key was not matched
+	 */
+	objectExists : function(key)
+	{
+		var i;
+		
+		// case insensitive
+		key = key.toLowerCase();
+		
+		for(i = 0; i < this.objects.length; i++)
+		{
+			// key exists
+			if(this.objects[i].key == key)
 				return i;
 		}
 		
@@ -97,7 +132,7 @@ var Resources = {
 		
 		// material exists
 		if(i != -1)
-			return this.materials[i].mat;
+			return this.materials[i].data;
 		
 		// material doesn't exist
 		return undefined;
@@ -119,7 +154,7 @@ var Resources = {
 		
 		// geometry exists
 		if(i != -1)
-			return this.geometries[i].geo;
+			return this.geometries[i].data;
 		
 		// geometry doesn't exist
 		return undefined;
@@ -141,9 +176,31 @@ var Resources = {
 		
 		// texture exists
 		if(i != -1)
-			return this.textures[i].tex;
+			return this.textures[i].data;
 			
 		// texture doesn't exist
+		return undefined;
+	},
+	
+	/*
+	 * Returns the object that matches the specified key
+	 *
+	 * @param	{String} key	the key for the object that will be returned
+	 *
+	 * @return	{Object 3D}		the object matching the specified key
+	 */
+	getObject : function(key)
+	{
+		var i;
+		
+		// look for object
+		i = this.objectExist(key);
+		
+		// object exists
+		if(i != -1)
+			return this.objects[i].data;
+			
+		// object doesn't exist
 		return undefined;
 	},
 	
@@ -162,7 +219,7 @@ var Resources = {
 			return false;
 		
 		// material doesn't exist
-		this.materials.push({key: key, mat: material});
+		this.materials.push({key: key, data: material});
 		return true;
 	},
 	
@@ -181,7 +238,7 @@ var Resources = {
 			return false;
 		
 		// geometry doesn't exist
-		this.geometries.push({key: key, geo: geometry});
+		this.geometries.push({key: key, data: geometry});
 		return true;
 	},
 	
@@ -200,8 +257,32 @@ var Resources = {
 			return false;
 			
 		// texture doesn't exist
-		this.textures.push({key: key, tex: texture});
+		this.textures.push({key: key, data: texture});
 		return true;
+	},
+	
+	/*
+	 * Adds the specified key/object combination to the object array.
+	 * Additionally, the object can also be added to a THREE.Scene
+	 *
+	 * @param	{String} key		the key of the object being added
+	 * @param	{Object 3D} object	the object being added
+	 * @param	{THREE.Scene} scene	the scene to add the object to (optional)
+	 *
+	 * @return	{BOOL}				if the object was successfully added
+	 */
+	addObject : function(key, object, scene)
+	{
+		// object already exists
+		if(this.objectExists(key) != -1)
+			return false
+			
+		// object doesn't exist
+		this.objects.push({key: key, data: object});
+		
+		// add to scene if passed in
+		if(scene)
+			scene.add(object);
 	},
 	
 	/*
@@ -214,7 +295,7 @@ var Resources = {
 	removeMaterial : function(key)
 	{
 		var i;
-		
+	
 		// look for materials
 		i = materialExists(key);
 		
@@ -239,7 +320,7 @@ var Resources = {
 	removeGeometry : function(key)
 	{
 		var i;
-		
+	
 		// look for geometry
 		i = geometryExists(key);
 		
@@ -261,8 +342,8 @@ var Resources = {
 	 *
 	 * @return	{BOOL}			if the texture was successfully removed
 	 */
-	 removeTexture : function(key)
-	 {
+	removeTexture : function(key)
+	{
 		var i;
 		
 		// look for texture
@@ -276,6 +357,63 @@ var Resources = {
 		}
 		
 		// texture doesn't exist
+		return false;
+	},
+	 
+	 /*
+	  * Removes the object with the specified key.
+	  * Additionally, the object can also be removed from a THREE.Scene
+	  *
+	  * @param	{String} key		the key of the object to be removed
+	  * @param	{THREE.Scene} scene	the scene to remove the object from
+	  *
+	  * @return	{BOOL}				if the object was successfully removed
+	  */
+	removeObject : function(key, scene)
+	{
+		var i;
+		
+		// look for object
+		i = objectExists(key);
+		
+		// object exists
+		if(i != -1)
+		{
+			// remove from scene if provided
+			if(scene)
+				scene.remove(this.objects[i].data);
+				
+			this.objects.splice(i, 1);
+			return true;
+		}
+	
+		// object doesn't exist
+		return false;
+	},
+	
+	/*
+	 * Removes the object with the specified key from the screen. Does not remove the object from the array
+	 *
+	 * @param	{String} key		the key of the object to be removed
+	 * @param	{THREE.Scene} scene	the scene to remove the object from
+	 *
+	 * @return	{BOOL}				if the object was successfully removed
+	 */
+	 removeFromScene : function(key, scene)
+	 {
+		var i;
+		
+		// look for object
+		i = objectExists(key);
+		
+		// object exists 
+		if(i != -1)
+		{
+			scene.remove(this.objects[i].data);
+			return true;
+		}
+		
+		// object doesn't exist
 		return false;
 	 }
 };
