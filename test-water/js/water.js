@@ -56,20 +56,24 @@ app.test = {
 		//////////////////////////////////////////////////////////////////////
 		for(var i = 0; i < this.geo.vertices.length;i++)
 		{
-			this.geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/50 * Math.PI)*3);
-			this.geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/50 * Math.PI)*3);
-			this.geo.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5);
+			this.geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/100 * Math.PI)*3);
+			this.geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/100 * Math.PI)*3);
+			//this.geo.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5);
+			this.geo.vertices[i].z = -(Math.sin(((i+this.count)/400)*Math.PI) * 10);
 			
 			if(this.showGrid)
 			{
-				this.geo2.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/50 * Math.PI)*3);
-				this.geo2.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/50 * Math.PI)*3);
-				this.geo2.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5) + 400;
+				this.geo2.vertices[i].x = this.geo.vertices[i].x;
+				this.geo2.vertices[i].y = this.geo.vertices[i].y;
+				this.geo2.vertices[i].z = this.geo.vertices[i].z + 400;
 			}
 		}
-		this.count+=.25;
+		this.count+=2;
 		this.geo.verticesNeedUpdate = true;
-		this.geo2.verticesNeedUpdate = true;
+		if(this.showGrid)
+		{
+			this.geo2.verticesNeedUpdate = true;
+		}
 		//////////////////////////////////////////////////////////////////////
 		
 		this.customUniforms.time.value += this.dt;
@@ -91,12 +95,12 @@ app.test = {
 				this.renderer = new THREE.WebGLRenderer({antialias: true});
 				this.renderer.setSize( window.innerWidth, window.innerHeight );
 				this.renderer.shadowMapEnabled = true;
-				this.renderer.setClearColor( 0xADBEED, 1);
+				this.renderer.setClearColor( 0x000000, 1);
 				document.body.appendChild(this.renderer.domElement );
 
 				this.controls = new THREE.FirstPersonControls(this.camera);
-				this.controls.movementSpeed = 100;
-				this.controls.lookSpeed = .1;
+				this.controls.movementSpeed = 300;
+				this.controls.lookSpeed = .2;
 				this.controls.autoForward = false;
 				this.camera.lookAt(100,-100,100);
 				
@@ -108,7 +112,7 @@ app.test = {
 				var baseTexture = new THREE.ImageUtils.loadTexture( "images/water.jpg" );
 				baseTexture.wrapS = baseTexture.wrapT = THREE.RepeatWrapping; 
 
-				var noiseTexture = new THREE.ImageUtils.loadTexture( "images/cloud.png" );
+				var noiseTexture = new THREE.ImageUtils.loadTexture( "images/noise1.png" );
 				noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping; 
 
 				var blendTexture = new THREE.ImageUtils.loadTexture( "images/waterblend.png" );
@@ -119,7 +123,7 @@ app.test = {
 					noiseTexture:	{ type: "t", value: noiseTexture },
 					blendTexture:	{ type: "t", value: blendTexture },
 					
-					baseSpeed:		{ type: "f", value: 0.01 },
+					baseSpeed:		{ type: "f", value: 0.001 },
 					
 					repeatCol:		{ type: "f", value: 4 },
 					repeatRow:		{ type: "f", value: 4 },
@@ -157,12 +161,29 @@ app.test = {
 				
 				this.scene.add(this.plane);
 				
-				this.geo2 = new THREE.PlaneGeometry(1000,1000,49,49);
-				var mat = new THREE.MeshPhongMaterial({color: 0xaaaaaa, wireframe: true});
+				if(this.showGrid)
+				{
+					this.geo2 = new THREE.PlaneGeometry(1000,1000,49,49);
+					var mat = new THREE.MeshPhongMaterial({color: 0x666666, wireframe: true});
+					
+					this.gridplane = new THREE.Mesh(this.geo2,mat);
+					this.gridplane.rotation.x=-0.5*Math.PI;
+					this.scene.add(this.gridplane);
+				}
 				
-				this.gridplane = new THREE.Mesh(this.geo2,mat);
-				this.gridplane.rotation.x=-0.5*Math.PI;
-				this.scene.add(this.gridplane);
+				var materialArray = [];
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+				for (var i = 0; i < 6; i++)
+				   materialArray[i].side = THREE.BackSide;
+				var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
+				var skyboxGeom = new THREE.CubeGeometry( 5000, 5000, 5000, 1, 1, 1 );
+				var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+				this.scene.add( skybox );
 				
 				var light = new THREE.DirectionalLight(0xffffff,4);
 				light.position.set(500,500,500);
@@ -183,6 +204,11 @@ app.test = {
 				this.scene.add(light);
 				
 				console.log(this.geo.vertices.length);
+				
+				var pointlight = new THREE.PointLight(0xffffff, 1, 100 );
+				pointlight.position.set(0,600,0);
+				pointlight.shadowCameraVisible	= true;
+				this.scene.add(pointlight);
 			},
 
 	
