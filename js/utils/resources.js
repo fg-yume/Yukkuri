@@ -19,9 +19,9 @@ var Resources = {
 	/*
 	 * Returns the index of the materials array that matches the key being searched
 	 *
-	 * @param	{String} key		the key of the material to search for
+	 * @param	{String} key	the key of the material to search for
 	 *
-	 * @return	{Number}			the index that matches the key being searched. Returns -1 if key was not matched
+	 * @return	{Number}		the index that matches the key being searched. Returns -1 if key was not matched
 	 */
 	materialExists : function(key)
 	{
@@ -44,9 +44,9 @@ var Resources = {
 	/*
 	 * Returns the index of the geometries array that matches the key being searched
 	 *
-	 * @param	{String} key		the key of the geometry to search for
+	 * @param	{String} key	the key of the geometry to search for
 	 *
-	 * @return	{Number}			the index that matches the key being searched. Returns -1 if key was not matched
+	 * @return	{Number}		the index that matches the key being searched. Returns -1 if key was not matched
 	 */
 	geometryExists : function(key)
 	{
@@ -69,9 +69,9 @@ var Resources = {
 	/*
 	 * Returns the index of the textures array that matches the key being searched
 	 *
-	 * @param	{String} key		the key of the texture to search for
+	 * @param	{String} key	the key of the texture to search for
 	 *
-	 * @return	{Number}			the index that matches the key being searched. Returns -1 if key was not matched
+	 * @return	{Number}		the index that matches the key being searched. Returns -1 if key was not matched
 	 */
 	textureExists : function(key)
 	{
@@ -94,9 +94,9 @@ var Resources = {
 	/*
 	 * Returns the index of the objects array that matches the key being searched
 	 *
-	 * @param	{String} key		the key of the object to search for
+	 * @param	{String} key	the key of the object to search for
 	 *
-	 * @return	{Number}			the index that matches the key being searched. Returns -1 if key was not matched
+	 * @return	{Number}		the index that matches the key being searched. Returns -1 if key was not matched
 	 */
 	objectExists : function(key)
 	{
@@ -296,7 +296,7 @@ var Resources = {
 	{
 		var i;
 	
-		// look for materials
+		// look for material
 		i = materialExists(key);
 		
 		// material exists

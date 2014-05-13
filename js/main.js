@@ -52,7 +52,7 @@ app.main = {
 		
 		this.cameraOrtho.left	= window.innerWidth / -2;
 		this.cameraOrtho.right	= window.innerWidth / 2;
-		this.cameraOrtho.top		= window.innerHeight / 2;
+		this.cameraOrtho.top	= window.innerHeight / 2;
 		this.cameraOrtho.bottom	= window.innerHeight / -2;
 		
 		// renderer
