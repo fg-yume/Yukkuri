@@ -1,3 +1,11 @@
+/*
+ * CameraManager.js
+ *
+ * @author	Freddy Garcia
+ *
+ * Handles all camera-related things
+ */
+
 "use strict";
 
 var CameraManager = {
@@ -12,7 +20,7 @@ var CameraManager = {
 	 *
 	 * @return	{Number}		the index that matches the key being searched. Returns -1 if key was not matched
 	 */
-	cameraExists : function(type, key)
+	cameraExists : function(key)
 	{
 		var i;
 		
@@ -32,11 +40,64 @@ var CameraManager = {
 	},
 	
 	/*
+	 * Adds the specified key/camera combination to the array of cameras
+	 *
+	 * @param	{String} key	the key of the camera to add
+	 * @param	{Object} camera	the camera to add
+	 *
+	 * @return	if the camera was successfully added
+	 */
+	addCamera : function(key, camera)
+	{
+		// camera exists
+		if(this.cameraExists(key) != -1)
+			return false;
+		
+		// camera doesn't exist
+		key = key.toLowerCase();
+		this.cameras.push({key; key, data: camera});
+		
+		return true;
+	},
+	
+	/*
+	 * Removes the specified camera from the array of cameras.
+	 * If the camera is currently active, then the active camera is also reset.
+	 *
+	 * @param	{String} key	the key of the camera to remove
+	 *
+	 * @return	if the camera was successfully removed
+	 */
+	removeCamera : function(key)
+	{
+		var i;
+		
+		i = this.cameraExists(key);
+	
+		// camera exists
+		if(i != -1)
+		{
+			key = key.toLowerCase();
+			
+			// reset active camera if necessary
+			if(this.activeCamera.key == key)
+				this.activeCamere = undefined;
+				
+			this.cameras.splice(i, 1);
+			
+			return true;
+		}
+		
+		// camera doesn't exist
+		return false;
+	},
+	
+	/*
 	 * Activates the camera with the specified key
 	 *
 	 * @param	{String} key	key of the camera to activate
 	 *
-	 * @return					if the camera was successfully activated
+	 * @return	if the camera was successfully activated
 	 */
 	activateCamera : function(key)
 	{
@@ -77,7 +138,7 @@ var CameraManager = {
 	 * @param	{Object} properties	the properties to modify in the camera
 	 * @param	{String} key		the key of the camera to modify (Optional)
 	 *
-	 * @return						if the camera was successfully modified
+	 * @return	if the camera was successfully modified
 	 */
 	modifyCamera(properties, key)
 	{
@@ -92,7 +153,7 @@ var CameraManager = {
 			// camera exists
 			if(i != -1)
 			{
-				// set position
+				// position
 				if(properties.position)
 				{
 					this.cameras[i].position.x = properties.position.x;
@@ -108,6 +169,12 @@ var CameraManager = {
 					this.cameras[i].position.z += properties.translate.z;
 				}
 				
+				// lookAt
+				if(properties.lookAt)
+					this.cameras[i].lookAt(properties.lookAt);
+					
+				// rotation
+				
 				return true;
 			}
 			
@@ -119,12 +186,29 @@ var CameraManager = {
 		// useful when calling this function from events such as resize()
 		else
 		{
-			// there's an active camera
+			// active camera set
 			if(this.activeCamera)
 			{
+				// position
+				if(properties.position)
+				{
+					this.activeCamera[i].position.x = properties.position.x;
+					this.activeCamera[i].position.y = properties.position.y;
+					this.activeCamera[i].position.z = properties.position.z;
+				}
+				
+				// translation
+				if(properties.translate)
+				{
+					this.activeCamera[i].position.x += properties.translate.x;
+					this.activeCamera[i].position.y += properties.translate.y;
+					this.activeCamera[i].position.z += properties.translate.z;
+				}
+				
+				return true;
 			}
 			
-			// there's no active camera
+			// active camera not set
 			return false;
 		}
 	}

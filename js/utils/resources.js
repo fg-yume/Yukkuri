@@ -219,6 +219,7 @@ var Resources = {
 			return false;
 		
 		// material doesn't exist
+		key = key.toLowerCase();
 		this.materials.push({key: key, data: material});
 		return true;
 	},
@@ -238,6 +239,7 @@ var Resources = {
 			return false;
 		
 		// geometry doesn't exist
+		key = key.toLowerCase();
 		this.geometries.push({key: key, data: geometry});
 		return true;
 	},
@@ -257,6 +259,7 @@ var Resources = {
 			return false;
 			
 		// texture doesn't exist
+		key = key.toLowerCase();
 		this.textures.push({key: key, data: texture});
 		return true;
 	},
@@ -278,11 +281,13 @@ var Resources = {
 			return false
 			
 		// object doesn't exist
+		key = key.toLowerCase();
 		this.objects.push({key: key, data: object});
 		
-		// add to scene if passed in
 		if(scene)
 			scene.add(object);
+			
+		return true;
 	},
 	
 	/*
