@@ -266,27 +266,22 @@ var ResourceManager = {
 	
 	/*
 	 * Adds the specified key/object combination to the object array.
-	 * Additionally, the object can also be added to a THREE.Scene
 	 *
 	 * @param	{String} key		the key of the object being added
 	 * @param	{Object 3D} object	the object being added
-	 * @param	{THREE.Scene} scene	the scene to add the object to (optional)
 	 *
 	 * @return	{BOOL}				if the object was successfully added
 	 */
-	addObject : function(key, object, scene)
+	addObject : function(key, object)
 	{
 		// object already exists
 		if(this.objectExists(key) != -1)
 			return false
 			
 		// object doesn't exist
+		
 		key = key.toLowerCase();
 		this.objects.push({key: key, data: object});
-		
-		if(scene)
-			scene.add(object);
-			
 		return true;
 	},
 	

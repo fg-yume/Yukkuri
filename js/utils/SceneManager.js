@@ -10,8 +10,8 @@
  
 var SceneManager = {
 	scenes        : new Array(), // holds the array of all THREE.Scene objects
-	previousScene : undefined,   // the previous active scene
-	activeScene   : undefined,   // the currently active scene
+	previousScene : undefined,   // previously active scene
+	activeScene   : undefined,   // currently active scene
 	
 	/*
 	 * Returns the index of the scenes array that matches the key being searched.
@@ -111,16 +111,16 @@ var SceneManager = {
 		if(i != -1)
 		{
 			// there's already an active camera
-			if(this.activeScene)
+			if(this.activeScene != undefined)
 			{
 				this.previousScene = this.activeScene;
-				this.activeScene   = this.scenes[i].data;
+				this.activeScene   = this.scenes[i];
 			}
 			
 			// no active camera
 			else
 			{
-				this.activeScene   = this.cameras[i].data;
+				this.activeScene   = this.scenes[i];
 				this.previousScene = this.activeScene;
 			}
 			
@@ -132,31 +132,45 @@ var SceneManager = {
 	},
 	
 	/*
-	 * Removes an object from the specified scene
+	 * Removes an object from the specified scene. If no scene is specified, removes from the currently active scene
 	 *
-	 * @param    {String} key               the key of the scene to remove the object from
 	 * @param    {THREE.Object3D} object    the object to remove
+	 * @param    {String} key               the key of the scene to remove the object from. [Optional]
 	 *
 	 * @return   if the object was successfully removed
 	 */
-	removeFromScene : function(key, object)
+	removeFromScene : function(object, key)
 	{
-		var i;
-		
-		// look for scene
-		i = this.sceneExists(key);
-		
-		if(i != -1)
+		// key specified
+		if(key != undefined)
 		{
-			// TODO: Check if object actually exists!
-		
-			// remove from scene
-			this.scenes[i].data.remove(object);
-			return true;
+			var i;
+			
+			// look for scene
+			i = this.sceneExists(key);
+			
+			if(i != -1)
+			{
+				// TODO: Check if object actually exists!
+			
+				// remove from scene
+				this.scenes[i].data.remove(object);
+				return true;
+			}
+			
+			// scene doesn't exist
+			return false;
 		}
 		
-		// scene doesn't exist
-		return false;
+		// key wasn't specified
+		else
+		{
+			if(this.activeCamera != undefined)
+				this.activeCamera.data.remove(object);
+		
+			// there's no active scene
+			return false;
+		}
 	},
 	
 	/*
@@ -167,7 +181,7 @@ var SceneManager = {
 	 *
 	 * @return   if the object was successfully added
 	 */
-	addToScene : function(key, object)
+	addToScene : function(object, key)
 	{
 		var i;
 		

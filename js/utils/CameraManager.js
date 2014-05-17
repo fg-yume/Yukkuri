@@ -11,8 +11,8 @@
 var CameraManager = {
 	// Variables ----------------------------------------------------
 	cameras			: new Array(), // holds a list of the available cameras
-	activeCamera	: undefined, // the camera to use when rendering
-	previousCamera	: undefined, // the previous active camera
+	activeCamera	: undefined,   // camera to use when rendering
+	previousCamera	: undefined,   // previously active camera
 	
 	/*
 	 * Returns the index of the cameras array that matches the key being searched. 
@@ -94,6 +94,40 @@ var CameraManager = {
 	},
 	
 	/*
+	 * Returns the specified camera. The active camera is returned if a 
+	 * specific camera is not specified
+	 *
+	 * @param    {String} key   the key of the camera to return [Optional]
+	 *
+	 * @return   specified camera, or currently active camera
+	 */
+	getCamera : function(key)
+	{
+		// key was specified
+		if(key != undefined)
+		{
+			var i;
+			
+			// look for camera
+			i = this.cameraExists(key);
+			
+			// camera exists
+			if(i != -1)
+				return this.cameras[i].data;
+				
+			// camera doesn't exist
+			return undefined;
+		}
+		
+		// key was not specified
+		else
+		{
+			if(this.activeCamera != undefined)
+				return this.activeCamera.data;
+		}
+	},
+	
+	/*
 	 * Activates the camera with the specified key
 	 *
 	 * @param	{String} key	key of the camera to activate
@@ -114,13 +148,13 @@ var CameraManager = {
 			if(this.activeCamera)
 			{
 				this.previousCamera = this.activeCamera;
-				this.activeCamera = this.cameras[i].data;
+				this.activeCamera = this.cameras[i];
 			}
 			
 			// no active camera
 			else
 			{
-				this.activeCamera = this.cameras[i].data;
+				this.activeCamera = this.cameras[i];
 				this.previousCamera = this.activeCamera;	
 			}
 			
@@ -155,22 +189,22 @@ var CameraManager = {
 				// position
 				if(properties.position)
 				{
-					this.cameras[i].position.x = properties.position.x;
-					this.cameras[i].position.y = properties.position.y;
-					this.cameras[i].position.z = properties.position.z;
+					this.cameras[i].data.position.x = properties.position.x;
+					this.cameras[i].data.position.y = properties.position.y;
+					this.cameras[i].data.position.z = properties.position.z;
 				}
 				
 				// translation
 				if(properties.translate)
 				{
-					this.cameras[i].position.x += properties.translate.x;
-					this.cameras[i].position.y += properties.translate.y;
-					this.cameras[i].position.z += properties.translate.z;
+					this.cameras[i].data.position.x += properties.translate.x;
+					this.cameras[i].data.position.y += properties.translate.y;
+					this.cameras[i].data.position.z += properties.translate.z;
 				}
 				
 				// lookAt
 				if(properties.lookAt)
-					this.cameras[i].lookAt(properties.lookAt);
+					this.cameras[i].data.lookAt(properties.lookAt);
 					
 				// rotation
 				
@@ -186,22 +220,22 @@ var CameraManager = {
 		else
 		{
 			// active camera set
-			if(this.activeCamera)
+			if(this.activeCamera != undefined)
 			{
 				// position
 				if(properties.position)
 				{
-					this.activeCamera[i].position.x = properties.position.x;
-					this.activeCamera[i].position.y = properties.position.y;
-					this.activeCamera[i].position.z = properties.position.z;
+					this.activeCamera[i].data.position.x = properties.position.x;
+					this.activeCamera[i].data.position.y = properties.position.y;
+					this.activeCamera[i].data.position.z = properties.position.z;
 				}
 				
 				// translation
 				if(properties.translate)
 				{
-					this.activeCamera[i].position.x += properties.translate.x;
-					this.activeCamera[i].position.y += properties.translate.y;
-					this.activeCamera[i].position.z += properties.translate.z;
+					this.activeCamera[i].data.position.x += properties.translate.x;
+					this.activeCamera[i].data.position.y += properties.translate.y;
+					this.activeCamera[i].data.position.z += properties.translate.z;
 				}
 				
 				return true;
