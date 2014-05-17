@@ -81,7 +81,7 @@ var CameraManager = {
 			
 			// reset active camera if necessary
 			if(this.activeCamera.key == key)
-				this.activeCamere = undefined;
+				this.activeCamera = undefined;
 				
 			this.cameras.splice(i, 1);
 			
