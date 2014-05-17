@@ -9,7 +9,8 @@
 "use strict";
  
 var SceneManager = {
-	scenes        : new Array(), // holds the array of all THREE.Scene objects
+	// Variables ---------------------------------------------------------
+	scenes        : new Array(), // contains THREE.Scene objects
 	previousScene : undefined,   // previously active scene
 	activeScene   : undefined,   // currently active scene
 	
@@ -132,6 +133,21 @@ var SceneManager = {
 	},
 	
 	/*
+	 * Returns the currently active scene
+	 *
+	 * @return   currently active scene. Returns undefined if there's no currently active scene
+	 */
+	getActiveScene : function(key)
+	{
+		// there's an active scene
+		if(this.activeScene != undefined)
+			return this.activeScene.data;
+			
+		// there's no active scene
+		return undefined;
+	},
+	
+	/*
 	 * Removes an object from the specified scene. If no scene is specified, removes from the currently active scene
 	 *
 	 * @param    {THREE.Object3D} object    the object to remove
@@ -165,8 +181,12 @@ var SceneManager = {
 		// key wasn't specified
 		else
 		{
-			if(this.activeCamera != undefined)
-				this.activeCamera.data.remove(object);
+			// there's an active scene
+			if(this.activeScene != undefined)
+			{
+				this.activeScene.data.remove(object);
+				return true;
+			}
 		
 			// there's no active scene
 			return false;
@@ -174,31 +194,49 @@ var SceneManager = {
 	},
 	
 	/*
-	 * Adds an object to the specified scene
+	 * Adds an object to the specified scene. If no scene is specified, the object is added to the currently active scene
 	 *
-	 * @param    {String} key               the key of the scene to add the object to
 	 * @param    {THREE.Object3D} object    the object to add
+	 * @param    {String} key               the key of the scene to add the object to [Optional]
 	 *
 	 * @return   if the object was successfully added
 	 */
 	addToScene : function(object, key)
 	{
-		var i;
-		
-		// look for scene
-		i = this.sceneExists(key);
-		
-		// scene exists
-		if(i != -1)
+		// key specified
+		if(key != undefined)
 		{
-			// TODO: Check if object actually exists!
+			var i;
 			
-			// add to scene
-			this.scenes[i].data.add(object);
-			return true;
+			// look for scene
+			i = this.sceneExists(key);
+			
+			// scene exists
+			if(i != -1)
+			{
+				// TODO: Check if object actually exists!
+				
+				// add to scene
+				this.scenes[i].data.add(object);
+				return true;
+			}
+			
+			// scene doesn't exist
+			return false;
 		}
 		
-		// scene doesn't exist
-		return false;
+		// key not specified
+		else
+		{
+			// there's an active scene
+			if(this.activeScene != undefined)
+			{
+				this.activeScene.data.add(object);
+				return true;
+			}
+				
+			// there's no active scene
+			return false;
+		}
 	}
 };

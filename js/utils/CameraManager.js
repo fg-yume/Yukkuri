@@ -10,7 +10,7 @@
 
 var CameraManager = {
 	// Variables ----------------------------------------------------
-	cameras			: new Array(), // holds a list of the available cameras
+	cameras			: new Array(), // contains available cameras
 	activeCamera	: undefined,   // camera to use when rendering
 	previousCamera	: undefined,   // previously active camera
 	
@@ -122,8 +122,12 @@ var CameraManager = {
 		// key was not specified
 		else
 		{
+			// there's an active camera
 			if(this.activeCamera != undefined)
 				return this.activeCamera.data;
+				
+			// there's no active camera
+			return undefined;
 		}
 	},
 	
@@ -219,7 +223,7 @@ var CameraManager = {
 		// useful when calling this function from events such as resize()
 		else
 		{
-			// active camera set
+			// there's an active camera
 			if(this.activeCamera != undefined)
 			{
 				// position
@@ -241,7 +245,7 @@ var CameraManager = {
 				return true;
 			}
 			
-			// active camera not set
+			// there's no active camera
 			return false;
 		}
 	}

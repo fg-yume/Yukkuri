@@ -11,10 +11,10 @@
 
 var ResourceManager = {
 	// Variables ----------------------------------------------------
-	materials	: new Array(),				// contains pre-built materials
-	geometries	: new Array(),				// contains pre-built geometries
-	textures	: new Array(),				// contains pre-built textures
-	objects		: new Array(),				// contains pre-built Object 3Ds
+	materials	: new Array(), // contains pre-built materials
+	geometries	: new Array(), // contains pre-built geometries
+	textures	: new Array(), // contains pre-built textures
+	objects		: new Array(), // contains pre-built Object 3Ds
 	
 	/*
 	 * Returns the index of the materials array that matches the key being searched
