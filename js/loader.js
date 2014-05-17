@@ -27,6 +27,8 @@ app.animationID = undefined;
 	queue.loadFile("js/lib/OrbitControls.js");
 	queue.loadFile("js/utils/input.js");
 	queue.loadFile("js/utils/resources.js");
+	queue.loadFile("js/utils/SceneManager.js");
+	queue.loadFile("js/utils/CameraManager.js");
 	//queue.loadFile("js/core/moveLight.js");
 	queue.loadFile("js/lizard.js");
 	queue.loadFile("js/main.js");

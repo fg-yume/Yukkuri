@@ -9,9 +9,9 @@
 "use strict";
  
 var SceneManager = {
-	var scenes        = undefined, // holds the array of all THREE.Scene objects
-	var previousScene = undefined, // the previous active scene
-	var activeScene   = undefined, // the currently active scene
+	scenes        : new Array(), // holds the array of all THREE.Scene objects
+	previousScene : undefined,   // the previous active scene
+	activeScene   : undefined,   // the currently active scene
 	
 	/*
 	 * Returns the index of the scenes array that matches the key being searched.

@@ -9,9 +9,10 @@
 "use strict";
 
 var CameraManager = {
-	var cameras			: undefined, // holds a list of the available cameras
-	var activeCamera	: undefined, // the camera to use when rendering
-	var previousCamera	: undefined, // the previous active camera
+	// Variables ----------------------------------------------------
+	cameras			: new Array(), // holds a list of the available cameras
+	activeCamera	: undefined, // the camera to use when rendering
+	previousCamera	: undefined, // the previous active camera
 	
 	/*
 	 * Returns the index of the cameras array that matches the key being searched. 
@@ -55,7 +56,7 @@ var CameraManager = {
 		
 		// camera doesn't exist
 		key = key.toLowerCase();
-		this.cameras.push({key; key, data: camera});
+		this.cameras.push({key: key, data: camera});
 		
 		return true;
 	},
@@ -138,7 +139,7 @@ var CameraManager = {
 	 *
 	 * @return	if the camera was successfully modified
 	 */
-	modifyCamera(properties, key)
+	modifyCamera : function(properties, key)
 	{
 		// specific camera to modify
 		if(key)
