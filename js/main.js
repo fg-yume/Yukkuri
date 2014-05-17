@@ -211,7 +211,7 @@ app.main = {
 			// if we have intersections
 			if(intersects.length > 0)
 			{
-				console.log("no-ortho intersects");
+				//console.log("no-ortho intersects");
 				
 				if(this.intersectOBJ != intersects[0].object)
 				{
@@ -244,7 +244,7 @@ app.main = {
 			intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
 			if(intersects.length > 0)
 			{
-				console.log("ortho intersect");
+				//console.log("ortho intersect");
 				
 				if(this.intersectOO != intersects[0].object)
 				{

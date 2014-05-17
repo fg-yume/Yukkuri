@@ -21,8 +21,7 @@ lizard.main = {
 	CAMERA_FAR_PLANE	: 5000, // far clipping plane for camera frustum
 	FOV_VERTICAL		: 75,	// vertical field of view for camera frustum
 
-	// Variables --------------------------------------------------------------------------
-	scene		: undefined, // threejs scene that will contain all objects to be rendered
+	// Variables -------------------------------------------------------------------------
 	renderer	: undefined, // threejs renderer that handles rendering the scene
 	camera		: undefined, // main threejs camera for viewing the scene
 	controls	: undefined, // camera controls for the scene
@@ -49,10 +48,7 @@ lizard.main = {
 	 * @return	none
 	 */
 	initThree : function()
-	{
-		// scene
-		this.scene = new THREE.Scene();
-		
+	{	
 		// camera
 		this.camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, lizard.ASPECT_RATIO, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
 		
@@ -223,13 +219,19 @@ lizard.main = {
 		test_mesh.castShadow = true;
 		
 		// Scene additions ---------------------------------------------------------
-		app.main.scene.add(this.light);
-		//this.scene.add(this.target);
-		app.main.scene.add(lizardOBJ);
-		app.main.scene.add(lizardEyeOBJ);
-		app.main.scene.add(rockOBJ);
-		app.main.scene.add(groundOBJ);
-		app.main.scene.add(test_mesh);
+		//app.main.scene.add(this.light);
+		//app.main.scene.add(lizardOBJ);
+		//app.main.scene.add(lizardEyeOBJ);
+		//app.main.scene.add(rockOBJ);
+		//app.main.scene.add(groundOBJ);
+		//app.main.scene.add(test_mesh);
+		SceneManager.activateScene("perspective");
+		SceneManager.addToScene(this.light);
+		SceneManager.addToScene(lizardOBJ);
+		SceneManager.addToScene(lizardEyeOBJ);
+		SceneManager.addToScene(rockOBJ);
+		SceneManager.addToScene(groundOBJ);
+		SceneManager.addToScene(test_mesh);
 		
 		// ready to render
 		this.ready = true;
@@ -278,7 +280,7 @@ lizard.main = {
 	 */
 	render : function()
 	{
-		app.main.renderer.render(app.main.scene, app.main.camera);
+		app.main.renderer.render(SceneManager.getScene(), app.main.camera);
 	},
 	
 	/*
