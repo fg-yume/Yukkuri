@@ -93,18 +93,98 @@ var SceneManager = {
 		return false;
 	},
 	
-	// TODO
+	/*
+	 * Activates the scene with the given key
+	 *
+	 * @param    {String} key   key of the scene to activate
+	 *
+	 * @return   if the scene was successfully activated
+	 */
 	activateScene : function(key)
 	{
+		var i;
+		
+		// look for scene
+		i = this.sceneExists(key);
+		
+		// scene exists
+		if(i != -1)
+		{
+			// there's already an active camera
+			if(this.activeScene)
+			{
+				this.previousScene = this.activeScene;
+				this.activeScene   = this.scenes[i].data;
+			}
+			
+			// no active camera
+			else
+			{
+				this.activeScene   = this.cameras[i].data;
+				this.previousScene = this.activeScene;
+			}
+			
+			return true;
+		}
+		
+		// scene doesn't exist
+		return false;
 	},
 	
-	// TODO
+	/*
+	 * Removes an object from the specified scene
+	 *
+	 * @param    {String} key               the key of the scene to remove the object from
+	 * @param    {THREE.Object3D} object    the object to remove
+	 *
+	 * @return   if the object was successfully removed
+	 */
 	removeFromScene : function(key, object)
 	{
+		var i;
+		
+		// look for scene
+		i = this.sceneExists(key);
+		
+		if(i != -1)
+		{
+			// TODO: Check if object actually exists!
+		
+			// remove from scene
+			this.scenes[i].data.remove(object);
+			return true;
+		}
+		
+		// scene doesn't exist
+		return false;
 	},
 	
-	// TODO
+	/*
+	 * Adds an object to the specified scene
+	 *
+	 * @param    {String} key               the key of the scene to add the object to
+	 * @param    {THREE.Object3D} object    the object to add
+	 *
+	 * @return   if the object was successfully added
+	 */
 	addToScene : function(key, object)
 	{
+		var i;
+		
+		// look for scene
+		i = this.sceneExists(key);
+		
+		// scene exists
+		if(i != -1)
+		{
+			// TODO: Check if object actually exists!
+			
+			// add to scene
+			this.scenes[i].data.add(object);
+			return true;
+		}
+		
+		// scene doesn't exist
+		return false;
 	}
 };

@@ -302,7 +302,7 @@ var Resources = {
 		var i;
 	
 		// look for material
-		i = materialExists(key);
+		i = this.materialExists(key);
 		
 		// material exists
 		if(i != -1)
@@ -327,7 +327,7 @@ var Resources = {
 		var i;
 	
 		// look for geometry
-		i = geometryExists(key);
+		i = this.geometryExists(key);
 		
 		// geometry exists
 		if(i != -1)
@@ -352,7 +352,7 @@ var Resources = {
 		var i;
 		
 		// look for texture
-		i = textureExists(key);
+		i = this.textureExists(key);
 		
 		// texture exists
 		if(i != -1)
@@ -379,7 +379,7 @@ var Resources = {
 		var i;
 		
 		// look for object
-		i = objectExists(key);
+		i = this.objectExists(key);
 		
 		// object exists
 		if(i != -1)
@@ -409,7 +409,7 @@ var Resources = {
 		var i;
 		
 		// look for object
-		i = objectExists(key);
+		i = this.objectExists(key);
 		
 		// object exists 
 		if(i != -1)

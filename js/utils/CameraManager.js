@@ -114,18 +114,16 @@ var CameraManager = {
 			{
 				this.previousCamera = this.activeCamera;
 				this.activeCamera = this.cameras[i].data;
-				
-				return true;
 			}
 			
 			// no active camera
 			else
 			{
 				this.activeCamera = this.cameras[i].data;
-				this.previousCamera = this.activeCamera;
-				
-				return true;
+				this.previousCamera = this.activeCamera;	
 			}
+			
+			return true;
 		}
 		
 		// camera doesn't exist
