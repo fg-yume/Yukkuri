@@ -16,15 +16,6 @@ lizard.HEIGHT		= window.innerHeight;			// height that the canvas will take up
 lizard.ASPECT_RATIO	= lizard.WIDTH / lizard.HEIGHT; // aspect ratio for the threejs camera
 
 lizard.main = {
-	// Constants --------------------------------------------------------------------------
-	CAMERA_NEAR_PLANE	: 1,	// near clipping plane for camera frustum
-	CAMERA_FAR_PLANE	: 5000, // far clipping plane for camera frustum
-	FOV_VERTICAL		: 75,	// vertical field of view for camera frustum
-
-	// Variables -------------------------------------------------------------------------
-	renderer	: undefined, // threejs renderer that handles rendering the scene
-	camera		: undefined, // main threejs camera for viewing the scene
-	controls	: undefined, // camera controls for the scene
 	testStep	: 0,
 	ready		: false,
 
@@ -43,36 +34,6 @@ lizard.main = {
 	},
 	
 	/*
-	 * Initializes necessary threejs objects
-	 *
-	 * @return	none
-	 */
-	initThree : function()
-	{	
-		// camera
-		this.camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, lizard.ASPECT_RATIO, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
-		
-		this.camera.position.y = 40;
-		this.camera.position.z = 30;
-		
-		// renderer
-		if(Detector.webgl)
-			this.renderer = new THREE.WebGLRenderer({antialias: true});
-		else
-			this.renderer = new THREE.CanvasRenderer();
-			
-		this.renderer.setClearColor(0x000000);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.shadowMapEnabled	= true;
-		this.renderer.shadowMapSoft		= true;
-		
-		// attaching to page
-		document.body.appendChild(this.renderer.domElement);
-		
-		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-	},
-	
-	/*
 	 * Loads any additional assets for the scene
 	 *
 	 * @return	none
@@ -84,15 +45,15 @@ lizard.main = {
 		
 		
 		jsonLoader.load("resources/lizard/objects/rock_obj.js", function(geometry){
-			Resources.addGeometry("rock", geometry);
+			Resources.addGeometry(geometry, "rock");
 		});
 		
 		jsonLoader.load("resources/lizard/objects/lizardeye_obj.js", function(geometry){
-			Resources.addGeometry("lizardeye", geometry);
+			Resources.addGeometry(geometry, "lizardeye");
 		});
 		
 		jsonLoader.load("resources/lizard/objects/ground_obj.js", function(geometry){
-			Resources.addGeometry("ground", geometry);
+			Resources.addGeometry(geometry, "ground");
 		});	
 	
 		// Textures ------------------------------------------------
@@ -108,17 +69,17 @@ lizard.main = {
 		var ground_diffuse		= new THREE.ImageUtils.loadTexture("resources/lizard/textures/ground_diffuse.png");
 		var ground_normal		= new THREE.ImageUtils.loadTexture("resources/lizard/textures/ground_normal.png");
 		
-		Resources.addTexture("lizard_diffuse", lizard_diffuse);
-		Resources.addTexture("lizard_normal", lizard_normal);
-		Resources.addTexture("lizard_specular", lizard_specular);
-		Resources.addTexture("lizard_emissive", lizard_emissive);
-		Resources.addTexture("lizardeye_diffuse", lizardeye_diffuse);
-		Resources.addTexture("lizardeye_emissive", lizardeye_emissive);
-		Resources.addTexture("rock_diffuse", rock_diffuse);
-		Resources.addTexture("rock_normal", rock_normal);
-		Resources.addTexture("rock_specular", rock_specular);
-		Resources.addTexture("ground_diffuse", ground_diffuse);
-		Resources.addTexture("ground_normal", ground_normal);
+		Resources.addTexture(lizard_diffuse, "lizard_diffuse");
+		Resources.addTexture(lizard_normal, "lizard_normal");
+		Resources.addTexture(lizard_specular, "lizard_specular");
+		Resources.addTexture(lizard_emissive, "lizard_emissive");
+		Resources.addTexture(lizardeye_diffuse, "lizardeye_diffuse");
+		Resources.addTexture(lizardeye_emissive, "lizardeye_emissive");
+		Resources.addTexture(rock_diffuse, "rock_diffuse");
+		Resources.addTexture(rock_normal, "rock_normal");
+		Resources.addTexture(rock_specular, "rock_specular");
+		Resources.addTexture(ground_diffuse, "ground_diffuse");
+		Resources.addTexture(ground_normal, "ground_normal");
 		
 		// Materials -----------------------------------------------
 		var darkMat		= new THREE.MeshBasicMaterial({color: 0xFFFFFF});
@@ -140,15 +101,15 @@ lizard.main = {
 		var groundMat		= new THREE.MeshPhongMaterial({map: Resources.getTexture("ground_diffuse")});
 		groundMat.normalMap	= Resources.getTexture("ground_normal");
 		
-		Resources.addMaterial("dark", darkMat);
-		Resources.addMaterial("wireframe", wireMat);
-		Resources.addMaterial("lizard", lizardMat);
-		Resources.addMaterial("lizardeye", lizardEyeMat);
-		Resources.addMaterial("rock", rockMat);
-		Resources.addMaterial("ground", groundMat);
+		Resources.addMaterial(darkMat, "dark");
+		Resources.addMaterial(wireMat, "wireframe");
+		Resources.addMaterial(lizardMat, "lizard");
+		Resources.addMaterial(lizardEyeMat, "lizardeye");
+		Resources.addMaterial(rockMat, "rock");
+		Resources.addMaterial(groundMat, "ground");
 		
 		jsonLoader.load("resources/lizard/objects/lizard_obj.js", function(geometry){
-			Resources.addGeometry("lizard", geometry);
+			Resources.addGeometry(geometry, "lizard");
 			
 			lizard.main.createWorld();
 		});
@@ -219,12 +180,6 @@ lizard.main = {
 		test_mesh.castShadow = true;
 		
 		// Scene additions ---------------------------------------------------------
-		//app.main.scene.add(this.light);
-		//app.main.scene.add(lizardOBJ);
-		//app.main.scene.add(lizardEyeOBJ);
-		//app.main.scene.add(rockOBJ);
-		//app.main.scene.add(groundOBJ);
-		//app.main.scene.add(test_mesh);
 		SceneManager.activateScene("perspective");
 		SceneManager.addToScene(this.light);
 		SceneManager.addToScene(lizardOBJ);
@@ -280,7 +235,8 @@ lizard.main = {
 	 */
 	render : function()
 	{
-		app.main.renderer.render(SceneManager.getScene(), app.main.camera);
+		CameraManager.activateCamera("perspective");
+		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	},
 	
 	/*

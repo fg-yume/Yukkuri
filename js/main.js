@@ -27,9 +27,7 @@ app.main = {
 	
 	// Variables ------------------------------------------------------------
 	renderer		: undefined,	  // threejs renderer that handles rendering the scene
-	camera			: undefined,	  // main threejs camera for viewing the scene
-	cameraOrtho		: undefined,	  // main orthographic camera for viewing the scene
-	projector		: undefined,	  // 
+	projector		: undefined,	  // handles raycasting
 	controls		: undefined, 	  // camera controls for the scene
 	currentState	: app.STATE.MAIN, // current state of the application
 	previousState	: app.STATE.MAIN, // previous state of the application
@@ -45,13 +43,13 @@ app.main = {
 	resize : function()
 	{	
 		// camera
-		this.camera.aspect = window.innerWidth / window.innerHeight;
-		this.camera.updateProjectionMatrix();
-		
-		this.cameraOrtho.left	= window.innerWidth / -2;
-		this.cameraOrtho.right	= window.innerWidth / 2;
-		this.cameraOrtho.top	= window.innerHeight / 2;
-		this.cameraOrtho.bottom	= window.innerHeight / -2;
+		CameraManager.getCamera("perspective").aspect = window.innerWidth / window.innerHeight;
+		CameraManager.getCamera("perspective").updateProjectionMatrix();
+	
+		CameraManager.getCamera("orthographic").left	= window.innerWidth / -2;
+		CameraManager.getCamera("orthographic").right	= window.innerWidth / 2;
+		CameraManager.getCamera("orthographic").top	= window.innerHeight / 2;
+		CameraManager.getCamera("orthographic").bottom	= window.innerHeight / -2;
 		
 		// renderer
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -85,25 +83,35 @@ app.main = {
 		var scene		= new THREE.Scene();
 		var sceneOrtho	= new THREE.Scene();
 		
-		SceneManager.addScene("perspective", scene);
-		SceneManager.addScene("orthographic", sceneOrtho);
+		SceneManager.addScene(scene, "perspective");
+		SceneManager.addScene(sceneOrtho,"orthographic");
 		SceneManager.activateScene("perspective");
 		
 		// test!
-		if(SceneManager.addScene("Perspective", scene))
+		if(SceneManager.addScene(scene, "Perspective"))
 			console.log("This should not happen!");
 		else
 			console.log("this should happen!");
 		
 		// camera
-		this.camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, window.innerWidth / window.innerHeight, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
+		var camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, window.innerWidth / window.innerHeight, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
 		
-		this.camera.position.y = 40;
-		this.camera.position.z = 30;
+		camera.position.y = 40;
+		camera.position.z = 30;
 		
-		this.cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
+		var cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
 		
-		this.cameraOrtho.position.z = 10;
+		cameraOrtho.position.z = 10;
+		
+		CameraManager.addCamera(camera, "perspective");
+		CameraManager.addCamera(cameraOrtho, "orthographic");
+		CameraManager.activateCamera("perspective");
+		
+		// Test!
+		if(CameraManager.addCamera(camera, "Perspective"))
+			console.log("this should not happen!");
+		else
+			console.log("this should happen!");
 		
 		// renderer
 		if(Detector.webgl)
@@ -124,7 +132,7 @@ app.main = {
 		document.body.appendChild(this.renderer.domElement);
 		
 		// control type
-		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+		this.controls = new THREE.OrbitControls(CameraManager.getCamera(), this.renderer.domElement);
 	},
 	
 	/*
@@ -199,11 +207,11 @@ app.main = {
 			
 			// Perspective Camera -----------------------------------------
 			var vector = new THREE.Vector3(Input.mouseX, Input.mouseY, 1.0);
-			this.projector.unprojectVector(vector, this.camera);
+			this.projector.unprojectVector(vector, CameraManager.getCamera("perspective"));
 			
 			//console.log("mpos: " + Input.mouseX + ", " + Input.mouseY);
 			
-			var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+			var ray = new THREE.Raycaster(CameraManager.getCamera("perspective").position, vector.sub(CameraManager.getCamera("perspective").position).normalize());
 			
 			// grab the list of objects that intersect with the ray
 			var intersects = ray.intersectObjects(SceneManager.getScene("perspective").children);
@@ -239,7 +247,7 @@ app.main = {
 			// Orthographic camera ----------------------------------------
 			vector = new THREE.Vector3(Input.mouseX, Input.mouseY * - 1, 0.5);
 			
-			ray = this.projector.pickingRay(vector, this.cameraOrtho);
+			ray = this.projector.pickingRay(vector, CameraManager.getCamera("orthographic"));
 			
 			intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
 			if(intersects.length > 0)
@@ -294,12 +302,14 @@ app.main = {
 			// regular pass
 			this.renderer.clear();
 			SceneManager.activateScene("perspective");
-			this.renderer.render(SceneManager.getScene(), this.camera);	
+			CameraManager.activateCamera("perspective");
+			this.renderer.render(SceneManager.getScene(), CameraManager.getCamera());	
 			
 			// HUD & buttons
 			this.renderer.clearDepth();
 			SceneManager.activateScene("orthographic");
-			this.renderer.render(SceneManager.getScene(), this.cameraOrtho);
+			CameraManager.activateCamera("orthographic");
+			this.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 			
 			break;
 			

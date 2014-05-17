@@ -43,12 +43,12 @@ var SceneManager = {
 	/* 
 	 * Adds the specified key/scene combination to the array of scenes
 	 *
-	 * @param    {String} key               the key of the scene to add
 	 * @param    {THREE.Scene} scene        the scene to add
+	 * @param    {String} key               the key of the scene to add
 	 *
 	 * @return   if the scene was successfully added
 	 */
-	addScene : function(key, scene)
+	addScene : function(scene, key)
 	{
 		// scene exists
 		if(this.sceneExists(key) != -1)
@@ -114,8 +114,18 @@ var SceneManager = {
 			// there's already an active camera
 			if(this.activeScene != undefined)
 			{
-				this.previousScene = this.activeScene;
-				this.activeScene   = this.scenes[i];
+				// scene is already active
+				if(this.activeScene.key == key)
+				{
+					// do nothing!
+				}
+				
+				// scene isn't already active
+				else
+				{
+					this.previousScene = this.activeScene;
+					this.activeScene   = this.scenes[i];
+				}
 			}
 			
 			// no active camera

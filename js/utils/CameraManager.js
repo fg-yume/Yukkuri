@@ -43,12 +43,12 @@ var CameraManager = {
 	/*
 	 * Adds the specified key/camera combination to the array of cameras
 	 *
+	 * @param   {Object} camera the camera to add
 	 * @param	{String} key	the key of the camera to add
-	 * @param	{Object} camera	the camera to add
 	 *
 	 * @return	if the camera was successfully added
 	 */
-	addCamera : function(key, camera)
+	addCamera : function(camera, key)
 	{
 		// camera exists
 		if(this.cameraExists(key) != -1)
@@ -149,10 +149,20 @@ var CameraManager = {
 		if(i != -1)
 		{
 			// there's already an active camera
-			if(this.activeCamera)
+			if(this.activeCamera != undefined)
 			{
-				this.previousCamera = this.activeCamera;
-				this.activeCamera = this.cameras[i];
+				// camera is already active
+				if(this.activeCamera.key == key)
+				{
+					// do nothing! :)
+				}
+				
+				// camera isn't already active
+				else
+				{
+					this.previousCamera = this.activeCamera;
+					this.activeCamera = this.cameras[i];
+				}
 			}
 			
 			// no active camera

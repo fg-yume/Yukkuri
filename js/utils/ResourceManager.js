@@ -207,12 +207,12 @@ var ResourceManager = {
 	/*
 	 * Adds the specified material/key combination to the materials array
 	 *
-	 * @param	{String} key		the key of the material being added
 	 * @param	{Material} material	the material being added
+	 * @param	{String} key		the key of the material being added
 	 *
 	 * @return	{BOOL}				if the material was successfully added
 	 */
-	addMaterial : function(key, material)
+	addMaterial : function(material, key)
 	{
 		// material already exists
 		if(this.materialExists(key) != -1)
@@ -227,12 +227,12 @@ var ResourceManager = {
 	/*
 	 * Adds the specified geometry/key combination to the geometry array
 	 *
-	 * @param	{String} key		the key of the geometry being added
 	 * @param	{Geometry} geometry	the geometry being added
+	 * @param	{String} key		the key of the geometry being added
 	 *
 	 * @return	{BOOL}				if the geometry was successfully added
 	 */
-	addGeometry : function(key, geometry)
+	addGeometry : function(geometry, key)
 	{
 		// geometry already exists
 		if(this.geometryExists(key) != -1)
@@ -247,12 +247,12 @@ var ResourceManager = {
 	/*
 	 * Adds the specified key/texture combination to the texture array
 	 *
-	 * @param	{String} key		the key of the texture being added
 	 * @param	{Texture} texture	the texture being added
+	 * @param	{String} key		the key of the texture being added
 	 *
 	 * @return	{BOOL}				if the texture was successfully added
 	 */
-	addTexture : function(key, texture)
+	addTexture : function(texture, key)
 	{
 		// texture already exists
 		if(this.textureExists(key) != -1)
@@ -267,12 +267,12 @@ var ResourceManager = {
 	/*
 	 * Adds the specified key/object combination to the object array.
 	 *
-	 * @param	{String} key		the key of the object being added
 	 * @param	{Object 3D} object	the object being added
+	 * @param	{String} key		the key of the object being added
 	 *
 	 * @return	{BOOL}				if the object was successfully added
 	 */
-	addObject : function(key, object)
+	addObject : function(object, key)
 	{
 		// object already exists
 		if(this.objectExists(key) != -1)
@@ -367,7 +367,7 @@ var ResourceManager = {
 	  *
 	  * @return	{BOOL}				if the object was successfully removed
 	  */
-	removeObject : function(key, scene)
+	removeObject : function(key)
 	{
 		var i;
 		
