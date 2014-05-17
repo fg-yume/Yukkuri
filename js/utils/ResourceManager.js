@@ -367,10 +367,8 @@ var ResourceManager = {
 	 
 	 /*
 	  * Removes the object with the specified key.
-	  * Additionally, the object can also be removed from a THREE.Scene
 	  *
 	  * @param	{String} key		the key of the object to be removed
-	  * @param	{THREE.Scene} scene	the scene to remove the object from
 	  *
 	  * @return	{BOOL}				if the object was successfully removed
 	  */
@@ -383,44 +381,14 @@ var ResourceManager = {
 		
 		// object exists
 		if(i != -1)
-		{
-			// remove from scene if provided
-			if(scene)
-				scene.remove(this.objects[i].data);
-				
+		{				
 			this.objects.splice(i, 1);
 			return true;
 		}
 	
 		// object doesn't exist
 		return false;
-	},
-	
-	/*
-	 * Removes the object with the specified key from the screen. Does not remove the object from the array
-	 *
-	 * @param	{String} key		the key of the object to be removed
-	 * @param	{THREE.Scene} scene	the scene to remove the object from
-	 *
-	 * @return	{BOOL}				if the object was successfully removed
-	 */
-	 removeFromScene : function(key, scene)
-	 {
-		var i;
-		
-		// look for object
-		i = this.objectExists(key);
-		
-		// object exists 
-		if(i != -1)
-		{
-			scene.remove(this.objects[i].data);
-			return true;
-		}
-		
-		// object doesn't exist
-		return false;
-	 }
+	}
 };
 
 // shorthand
