@@ -9,7 +9,7 @@
  
 "use strict";
 
-var Resources = {
+var ResourceManager = {
 	// Variables ----------------------------------------------------
 	materials	: new Array(),				// contains pre-built materials
 	geometries	: new Array(),				// contains pre-built geometries
@@ -422,3 +422,6 @@ var Resources = {
 		return false;
 	 }
 };
+
+// shorthand
+var Resources = ResourceManager;
