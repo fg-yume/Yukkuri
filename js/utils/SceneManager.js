@@ -133,18 +133,40 @@ var SceneManager = {
 	},
 	
 	/*
-	 * Returns the currently active scene
+	 * Returns the specified scene. If no scene is specified,
+	 * the currently active scene is returned
 	 *
-	 * @return   currently active scene. Returns undefined if there's no currently active scene
+	 * @param
+	 *
+	 * @return   specified scene or currently active scene. Returns undefined if there scene is not found
 	 */
-	getActiveScene : function(key)
+	getScene : function(key)
 	{
-		// there's an active scene
-		if(this.activeScene != undefined)
-			return this.activeScene.data;
+		// scene was specified
+		if(key != undefined)
+		{
+			var i;
 			
-		// there's no active scene
-		return undefined;
+			i = this.sceneExists(key);
+			
+			// scene exists
+			if(i != -1)
+				return this.scenes[i].data;
+				
+			// scene doesn't exist
+			return undefined;
+		}
+		
+		// scene wasn't specified - use active scene
+		else
+		{
+			// there's an active scene
+			if(this.activeScene != undefined)
+				return this.activeScene.data;
+				
+			// there's no active scene
+			return undefined;
+		}
 	},
 	
 	/*

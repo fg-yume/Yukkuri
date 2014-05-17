@@ -26,8 +26,6 @@ app.main = {
 	FOV_VERTICAL		: 75,	// vertical field of view for camera frustum
 	
 	// Variables ------------------------------------------------------------
-	scene			: undefined,	  // threejs scene that will contain all objects to be rendered
-	sceneOrtho		: undefined,	  // threejs scene that will contain all HUD elements to be rendered
 	renderer		: undefined,	  // threejs renderer that handles rendering the scene
 	camera			: undefined,	  // main threejs camera for viewing the scene
 	cameraOrtho		: undefined,	  // main orthographic camera for viewing the scene
@@ -84,8 +82,18 @@ app.main = {
 	initThree : function()
 	{
 		// scene
-		this.scene		= new THREE.Scene();
-		this.sceneOrtho	= new THREE.Scene();
+		var scene		= new THREE.Scene();
+		var sceneOrtho	= new THREE.Scene();
+		
+		SceneManager.addScene("perspective", scene);
+		SceneManager.addScene("orthographic", sceneOrtho);
+		SceneManager.activateScene("perspective");
+		
+		// test!
+		if(SceneManager.addScene("Perspective", scene))
+			console.log("This should not happen!");
+		else
+			console.log("this should happen!");
 		
 		// camera
 		this.camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, window.innerWidth / window.innerHeight, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
@@ -140,9 +148,11 @@ app.main = {
 		
 		this.sphere_mesh = new THREE.Mesh(sphere_geo, sphere_mat);
 		
-		this.scene.add(this.sphere_mesh);
-		this.sceneOrtho.add(this.sprite);
+		//this.scene.add(this.sphere_mesh);
+		//this.sceneOrtho.add(this.sprite);
 		//this.scene.add(sprite);
+		SceneManager.addToScene(this.sphere_mesh, "perspective");
+		SceneManager.addToScene(this.sprite, "orthographic");
 		
 		this.animate();
 	},
@@ -159,8 +169,17 @@ app.main = {
 				console.log("clicked!");
 				this.changeGameState(app.STATE.LIZARD);
 				
-				this.scene.remove(this.sphere_mesh);
-				this.sceneOrtho.remove(this.sprite);
+				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
+					console.log("proper remove from perspective");
+					
+				else
+					console.log("not proper remove from perspective!");
+				
+				if(SceneManager.removeFromScene(this.sprite, "orthographic"))
+					console.log("proper remove from ortho");
+					
+				else
+					console.log("not proper remove from ortho!");
 				
 				lizard.main.init();	
 			}
@@ -187,7 +206,7 @@ app.main = {
 			var ray = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
 			
 			// grab the list of objects that intersect with the ray
-			var intersects = ray.intersectObjects(this.scene.children);
+			var intersects = ray.intersectObjects(SceneManager.getScene("perspective").children);
 			
 			// if we have intersections
 			if(intersects.length > 0)
@@ -222,7 +241,7 @@ app.main = {
 			
 			ray = this.projector.pickingRay(vector, this.cameraOrtho);
 			
-			intersects = ray.intersectObjects(this.sceneOrtho.children);
+			intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
 			if(intersects.length > 0)
 			{
 				console.log("ortho intersect");
@@ -274,11 +293,13 @@ app.main = {
 		
 			// regular pass
 			this.renderer.clear();
-			this.renderer.render(this.scene, this.camera);	
+			SceneManager.activateScene("perspective");
+			this.renderer.render(SceneManager.getScene(), this.camera);	
 			
 			// HUD & buttons
 			this.renderer.clearDepth();
-			this.renderer.render(this.sceneOrtho, this.cameraOrtho);
+			SceneManager.activateScene("orthographic");
+			this.renderer.render(SceneManager.getScene(), this.cameraOrtho);
 			
 			break;
 			
