@@ -230,7 +230,7 @@ app.lizard = {
 	 */
 	render : function()
 	{
-		CameraManager.activateCamera("perspective");
+		CameraManager.activateCamera("perspective_OC");
 		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	}
 };

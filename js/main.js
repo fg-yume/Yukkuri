@@ -45,8 +45,8 @@ app.main = {
 	resize : function()
 	{	
 		// camera
-		CameraManager.getCamera("perspective").aspect = window.innerWidth / window.innerHeight;
-		CameraManager.getCamera("perspective").updateProjectionMatrix();
+		CameraManager.getCamera("perspective_OC").aspect = window.innerWidth / window.innerHeight;
+		CameraManager.getCamera("perspective_OC").updateProjectionMatrix();
 	
 		CameraManager.getCamera("orthographic").left	= window.innerWidth / -2;
 		CameraManager.getCamera("orthographic").right	= window.innerWidth / 2;
@@ -105,12 +105,12 @@ app.main = {
 		
 		cameraOrtho.position.z = 10;
 		
-		CameraManager.addCamera(camera, "perspective");
+		CameraManager.addCamera(camera, "perspective_OC");
 		CameraManager.addCamera(cameraOrtho, "orthographic");
-		CameraManager.activateCamera("perspective");
+		CameraManager.activateCamera("perspective_OC");
 		
 		// Test!
-		if(CameraManager.addCamera(camera, "Perspective"))
+		if(CameraManager.addCamera(camera, "perspective_OC"))
 			console.log("this should not happen!");
 		else
 			console.log("this should happen!");
@@ -235,11 +235,11 @@ app.main = {
 			
 			// Perspective Camera -----------------------------------------
 			var vector = new THREE.Vector3(Input.mouseX, Input.mouseY, 1.0);
-			this.projector.unprojectVector(vector, CameraManager.getCamera("perspective"));
+			this.projector.unprojectVector(vector, CameraManager.getCamera("perspective_OC"));
 			
 			//console.log("mpos: " + Input.mouseX + ", " + Input.mouseY);
 			
-			var ray = new THREE.Raycaster(CameraManager.getCamera("perspective").position, vector.sub(CameraManager.getCamera("perspective").position).normalize());
+			var ray = new THREE.Raycaster(CameraManager.getCamera("perspective_OC").position, vector.sub(CameraManager.getCamera("perspective_OC").position).normalize());
 			
 			// grab the list of objects that intersect with the ray
 			var intersects = ray.intersectObjects(SceneManager.getScene("perspective").children);
@@ -339,7 +339,7 @@ app.main = {
 			// regular pass
 			this.renderer.clear();
 			SceneManager.activateScene("perspective");
-			CameraManager.activateCamera("perspective");
+			CameraManager.activateCamera("perspective_OC");
 			this.renderer.render(SceneManager.getScene(), CameraManager.getCamera());	
 			
 			// HUD & buttons

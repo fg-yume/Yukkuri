@@ -47,15 +47,15 @@ app.refraction = {
 		var refractionCamera = new THREE.CubeCamera(0.1, 5000, 512);
 		refractionCamera.renderTarget.mapping = new THREE.CubeRefractionMapping();
 		
-		CameraManager.addCamera(camera, "refraction_persp");
+		CameraManager.addCamera(camera, "perspective_FPC");
 		CameraManager.addCamera(refractionCamera, "refraction_refrac");
-		CameraManager.modifyCamera(properties, "refraction_persp");
+		CameraManager.modifyCamera(properties, "perspective_FPC");
 		
 		// Renderer ----------------------------------------------------
 		app.main.renderer.setClearColor(0xADBEED);
 		
 		// Controls ----------------------------------------------------
-		this.controls = new THREE.FirstPersonControls(CameraManager.getCamera("refraction_persp"));
+		this.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
 		this.controls.movementSpeed = 300;
 		this.controls.lookSpeed     = .2;
 		this.controls.autoForward    = false;
@@ -226,7 +226,7 @@ app.refraction = {
 	render : function()
 	{
 		SceneManager.activateScene("perspective");
-		CameraManager.activateCamera("refraction_persp");
+		CameraManager.activateCamera("perspective_FPC");
 	
 		Resources.getObject("refraction_sphere").visible = false;
 		CameraManager.getCamera("refraction_refrac").updateCubeMap(app.main.renderer, SceneManager.getScene());
