@@ -16,7 +16,9 @@ app.STATE = {
 	"MAIN" 		: 0,
 	"LOADING"	: 1,
 	"LIZARD"	: 2,
-	"WATER"		: 3
+	"REFRACTION": 3,
+	"WATER"     : 4,
+	"REFLECTION": 5
 };
 
 app.main = {
@@ -79,7 +81,7 @@ app.main = {
 	 */
 	initThree : function()
 	{
-		// scene
+		// Scene --------------------------------------------------------
 		var scene		= new THREE.Scene();
 		var sceneOrtho	= new THREE.Scene();
 		
@@ -93,7 +95,7 @@ app.main = {
 		else
 			console.log("this should happen!");
 		
-		// camera
+		// Camera --------------------------------------------------------
 		var camera = new THREE.PerspectiveCamera(this.FOV_VERTICAL, window.innerWidth / window.innerHeight, this.CAMERA_NEAR_PLANE, this.CAMERA_FAR_PLANE);
 		
 		camera.position.y = 40;
@@ -113,7 +115,7 @@ app.main = {
 		else
 			console.log("this should happen!");
 		
-		// renderer
+		// Renderer -------------------------------------------------------
 		if(Detector.webgl)
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
 		else
@@ -174,9 +176,10 @@ app.main = {
 			{
 				this.intersect00 = null;
 			
-				console.log("clicked!");
+				console.log("going to lizard!");
 				this.changeGameState(app.STATE.LIZARD);
 				
+				// remove items from scene
 				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
 					console.log("proper remove from perspective");
 					
@@ -189,7 +192,32 @@ app.main = {
 				else
 					console.log("not proper remove from ortho!");
 				
-				lizard.main.init();	
+				// begin lizard
+				app.lizard.init();	
+			}
+			
+			if(this.intersectOBJ)
+			{
+				this.intersectOBJ = null;
+				
+				console.log("going to refraction!");
+				this.changeGameState(app.STATE.REFRACTION);
+				
+				// remove items from scene
+				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
+					console.log("proper remove from perspective");
+					
+				else
+					console.log("not proper remove from perspective!");
+				
+				if(SceneManager.removeFromScene(this.sprite, "orthographic"))
+					console.log("proper remove from ortho");
+					
+				else
+					console.log("not proper remove from ortho!");
+					
+				// begin refraction
+				app.refraction.init();
 			}
 		}
 	},
@@ -280,8 +308,17 @@ app.main = {
 				
 		case app.STATE.LIZARD:
 			
-			if(lizard.main.ready)
-				lizard.main.update();
+			if(app.lizard.ready)
+				app.lizard.update();
+				
+			break;
+			
+		case app.STATE.REFRACTION:
+			
+			if(app.refraction.ready)
+				app.refraction.update();
+		
+			break;
 				
 		default:
 			break;
@@ -315,8 +352,21 @@ app.main = {
 			
 		case app.STATE.LIZARD:
 			
-			if(lizard.main.ready)
-				lizard.main.render();
+			if(app.lizard.ready)
+			{
+				this.renderer.clear();
+				app.lizard.render();
+			}
+			
+			break;
+			
+		case app.STATE.REFRACTION:
+		
+			if(app.refraction.ready)
+			{
+				this.renderer.clear();
+				app.refraction.render();
+			}
 			
 			break;
 			

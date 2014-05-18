@@ -194,7 +194,7 @@ var ResourceManager = {
 		var i;
 		
 		// look for object
-		i = this.objectExist(key);
+		i = this.objectExists(key);
 		
 		// object exists
 		if(i != -1)

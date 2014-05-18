@@ -1,5 +1,5 @@
 /*
- * main.js
+ * lizard.js
  *
  * @author	Freddy Garcia
  *
@@ -8,14 +8,9 @@
  
 "use strict";
 
-var lizard = lizard || {};
+var app = app || {};
 
-// Lizard Globals -------------------------------------------------------------------------
-lizard.WIDTH		= window.innerWidth; 			// width that the canvas will take up
-lizard.HEIGHT		= window.innerHeight;			// height that the canvas will take up
-lizard.ASPECT_RATIO	= lizard.WIDTH / lizard.HEIGHT; // aspect ratio for the threejs camera
-
-lizard.main = {
+app.lizard = {
 	testStep	: 0,
 	ready		: false,
 
@@ -111,7 +106,7 @@ lizard.main = {
 		jsonLoader.load("resources/lizard/objects/lizard_obj.js", function(geometry){
 			Resources.addGeometry(geometry, "lizard");
 			
-			lizard.main.createWorld();
+			app.lizard.createWorld();
 		});
 		
 	},
@@ -237,18 +232,5 @@ lizard.main = {
 	{
 		CameraManager.activateCamera("perspective");
 		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
-	},
-	
-	/*
-	 * Main loop for lizard.
-	 *
-	 * @return	none
-	 */
-	loop : function()
-	{
-		lizard.animationID = requestAnimationFrame(this.loop.bind(this));
-		
-		this.update();
-		this.render();
 	}
 };
