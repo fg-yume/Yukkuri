@@ -18,7 +18,8 @@ app.STATE = {
 	"LIZARD"	: 2,
 	"REFRACTION": 3,
 	"WATER"     : 4,
-	"REFLECTION": 5
+	"REFLECTION": 5,
+	"PAUSED"	: 6,
 };
 
 app.main = {
@@ -334,6 +335,11 @@ app.main = {
 				app.water.update();
 		
 			break;
+			
+		case app.STATE.PAUSED:
+		
+			// do nothing
+			break;
 				
 		default:
 			break;
@@ -403,6 +409,13 @@ app.main = {
 				app.water.render();
 			}
 			
+			break;
+			
+		case app.STATE.PAUSED:
+		
+			// do nothing
+			break;
+			
 		default:
 			break;
 		}
@@ -415,7 +428,7 @@ app.main = {
 	 */
 	animate : function()
 	{
-		this.animationID = requestAnimationFrame(this.animate.bind(this));
+		app.animationID = requestAnimationFrame(this.animate.bind(this));
 		
 		this.update();
 		this.render();
