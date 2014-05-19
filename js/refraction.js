@@ -1,11 +1,21 @@
+/*
+ * refraction.js
+ *
+ * @author Alex Mancillas
+ * @edit   Freddy Garcia
+ *
+ * Refraction experience
+ */
+
 "use strict";
+
 // if app exists use the existing copy
 // else create a new object literal
 var app = app || {};
 
 app.refraction = {
 	dt      : 1/60,      // handles FPS
-	controls: undefined, // the first person controls that will be used
+	//controls: undefined, // the first person controls that will be used
 	ready   : false,     // if the experiment is ready to play
 	
 	/*
@@ -36,71 +46,71 @@ app.refraction = {
 		
 		// Camera -----------------------------------------------------
 		var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-		camera.position.y = 0;
-		camera.position.z = 0;
-		camera.position.x = -800;	
 		
 		var properties = {
-			lookAt : new THREE.Vector3(100, 100, 100)
+			lookAt : new THREE.Vector3(100, 100, 100),
+			position: {x: -800, y: 0, z: 0}
 		};
 		
 		var refractionCamera = new THREE.CubeCamera(0.1, 5000, 512);
 		refractionCamera.renderTarget.mapping = new THREE.CubeRefractionMapping();
 		
 		CameraManager.addCamera(camera, "perspective_FPC");
-		CameraManager.addCamera(refractionCamera, "refraction_refrac");
+		CameraManager.addCamera(refractionCamera, "cube_refraction");
 		CameraManager.modifyCamera(properties, "perspective_FPC");
 		
 		// Renderer ----------------------------------------------------
 		app.main.renderer.setClearColor(0xADBEED);
 		
 		// Controls ----------------------------------------------------
-		this.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
-		this.controls.movementSpeed = 300;
-		this.controls.lookSpeed     = .2;
-		this.controls.autoForward    = false;
+		app.main.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
+		app.main.controls.movementSpeed = 300;
+		app.main.controls.lookSpeed     = .2;
+		app.main.controls.autoForward   = false;
 	},
 	
+	/*
+	 * Loads and creates assets for the experience
+	 *
+	 * @return  none
+	 */
 	loadAndCreateAssets : function()
 	{
 		// Geometries ------------------------------------------------------
 		var geometry = new THREE.BoxGeometry(1, 1, 1, 1);
 		var floorgeo = new THREE.Geometry();
 		
-		// Random population of cubes
-		for(var ix = 0; ix < 25; ix++)
+		// Population of cubes
+		for(var ix = 0; ix < 225; ix++)
 		{
-			for(var iy = 0; iy < 25; iy++)
-			{
-				var cube = new THREE.Mesh(geometry.clone());
-				cube.scale.x = 50;
-				cube.position.x = -(Math.random()*1000 - 1200);
-				cube.scale.y = 50;
-				cube.position.y = (Math.random()*2000 - 1000);
-				cube.scale.z = 50;
-				cube.position.z = (Math.random()*2000 - 1000);
-				
-				THREE.GeometryUtils.merge(floorgeo, cube);
-			}
+			var cube = new THREE.Mesh(geometry.clone());
+			cube.scale.x = 50;
+			cube.position.x = -(Math.random()*1000 - 1200);
+			cube.scale.y = 50;
+			cube.position.y = (Math.random()*2000 - 1000);
+			cube.scale.z = 50;
+			cube.position.z = (Math.random()*2000 - 1000);
+			
+			THREE.GeometryUtils.merge(floorgeo, cube);
 		}
 		
 		Resources.addGeometry(floorgeo, "refraction_floor");
 		
 		// Textures --------------------------------------------------------
-		var default_diffuse = THREE.ImageUtils.loadTexture("resources/refraction/textures/defaultTexture.png");
+		var skybox_diffuse = THREE.ImageUtils.loadTexture("resources/refraction/textures/defaultTexture.png");
 		
-		Resources.addTexture(default_diffuse, "refraction_default");
+		Resources.addTexture(skybox_diffuse, "refraction_skybox");
 		
 		// Materials -------------------------------------------------------
 		
 		// skybox
 		var materialArray = [];
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_default") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("refraction_skybox") }));
 		
 		for (var i = 0; i < 6; i++)
 		   materialArray[i].side = THREE.BackSide;
@@ -111,15 +121,21 @@ app.refraction = {
 		var refractionMaterial = new THREE.MeshBasicMaterial(
 		{
 			color: 0xffffff, // do not alter the refraction color
-			envMap: CameraManager.getCamera("refraction_refrac").renderTarget, //mapping will be rendered by the camera's render target
+			envMap: CameraManager.getCamera("cube_refraction").renderTarget, //mapping will be rendered by the camera's render target
 			refractionRatio: 0.97, //a happy medium, will have the cool effect without over doing it or making it bland
 			reflectivity: 0.9
 		});
 		
 		Resources.addMaterial(skyboxMaterial, "refraction_skybox");
-		Resources.addMaterial(refractionMaterial, "refraction_refrac");
+		Resources.addMaterial(refractionMaterial, "cube_refraction");
 	},
 	
+	/*
+	 * Handles additional asset creation and adds all objects to
+	 * the experience
+	 *
+	 * @return  none
+	 */
 	createWorld : function()
 	{
 		// Objects --------------------------------------------------------
@@ -133,7 +149,7 @@ app.refraction = {
 		
 		var skybox = new THREE.Mesh(skyboxGeom, Resources.getMaterial("refraction_skybox"));
 		
-		var refractionSphere = new THREE.Mesh(refracGeom, Resources.getMaterial("refraction_refrac"));
+		var refractionSphere = new THREE.Mesh(refracGeom, Resources.getMaterial("cube_refraction"));
 		refractionSphere.position.set(-100, 0, 0);
 		
 		Resources.addObject(floor, "refraction_floor");
@@ -196,7 +212,7 @@ app.refraction = {
 		spotlight4.castShadow = true;
 	
 		// Scene Additions ------------------------------------------------
-		SceneManager.addToScene(CameraManager.getCamera("refraction_refrac"), "perspective");
+		SceneManager.addToScene(CameraManager.getCamera("cube_refraction"), "perspective");
 		SceneManager.addToScene(Resources.getObject("refraction_floor"), "perspective");
 		SceneManager.addToScene(Resources.getObject("refraction_skybox"), "perspective");
 		SceneManager.addToScene(Resources.getObject("refraction_sphere"), "perspective");
@@ -212,24 +228,34 @@ app.refraction = {
 			position : {x: -100, y: 0, z: 0}
 		};
 		
-		CameraManager.modifyCamera(properties, "refraction_refrac");
+		CameraManager.modifyCamera(properties, "cube_refraction");
 		
 		this.ready = true;
 	},
 		
+	/*
+	 * Updates all of the objects in the experience
+	 *
+	 * @return  none
+	 */
     update: function()
 	{
 		// UPDATE
-		this.controls.update(this.dt);
+		app.main.controls.update(this.dt);
 	},
 	
+	/* 
+	 * Renders all of the objects in the experience
+	 *
+	 * @return  none
+	 */
 	render : function()
 	{
 		SceneManager.activateScene("perspective");
 		CameraManager.activateCamera("perspective_FPC");
 	
 		Resources.getObject("refraction_sphere").visible = false;
-		CameraManager.getCamera("refraction_refrac").updateCubeMap(app.main.renderer, SceneManager.getScene());
+		CameraManager.getCamera("cube_refraction").updateCubeMap(app.main.renderer, SceneManager.getScene());
 		Resources.getObject("refraction_sphere").visible = true;
 		
 		// DRAW	

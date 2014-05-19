@@ -177,7 +177,7 @@ app.main = {
 				this.intersect00 = null;
 			
 				console.log("going to lizard!");
-				this.changeGameState(app.STATE.LIZARD);
+				this.changeGameState(app.STATE.REFLECTION);
 				
 				// remove items from scene
 				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
@@ -192,8 +192,8 @@ app.main = {
 				else
 					console.log("not proper remove from ortho!");
 				
-				// begin lizard
-				app.lizard.init();	
+				// begin reflection
+				app.reflection.init();	
 			}
 			
 			if(this.intersectOBJ)
@@ -232,6 +232,7 @@ app.main = {
 		switch(this.currentState)
 		{
 		case app.STATE.MAIN:
+			this.controls.update(1/60);
 			
 			// Perspective Camera -----------------------------------------
 			var vector = new THREE.Vector3(Input.mouseX, Input.mouseY, 1.0);
@@ -319,6 +320,13 @@ app.main = {
 				app.refraction.update();
 		
 			break;
+			
+		case app.STATE.REFLECTION:
+		
+			if(app.reflection.ready)
+				app.reflection.update();
+				
+			break;
 				
 		default:
 			break;
@@ -368,6 +376,16 @@ app.main = {
 				app.refraction.render();
 			}
 			
+			break;
+			
+		case app.STATE.REFLECTION:
+		
+			if(app.reflection.ready)
+			{
+				this.renderer.clear();
+				app.reflection.render();
+			}
+		
 			break;
 			
 		default:

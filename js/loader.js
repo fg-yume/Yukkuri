@@ -34,6 +34,7 @@ app.animationID = undefined;
 	//queue.loadFile("js/core/moveLight.js");
 	queue.loadFile("js/lizard.js");
 	queue.loadFile("js/refraction.js");
+	queue.loadFile("js/reflection.js");
 	queue.loadFile("js/main.js");
 	
 	/*

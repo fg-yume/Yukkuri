@@ -29,7 +29,7 @@ app.lizard = {
 	},
 	
 	/*
-	 * Loads any additional assets for the scene
+	 * Loads and creates assets for the experience
 	 *
 	 * @return	none
 	 */
@@ -111,6 +111,12 @@ app.lizard = {
 		
 	},
 	
+	/*
+	 * Handles additional asset creation and adds all objects to
+	 * the experience
+	 *
+	 * @return  none
+	 */
 	createWorld : function()
 	{
 		// Test Light
@@ -190,7 +196,7 @@ app.lizard = {
 	},
 	
 	/*
-	 * Updates all of the objects in the scene
+	 * Updates all of the objects in the experience
 	 *
 	 * @return	none
 	 */
@@ -224,13 +230,14 @@ app.lizard = {
 	},
 	
 	/*
-	 * Renders all of the objects in the scene
+	 * Renders all of the objects in the experience
 	 *
 	 * @return	none
 	 */
 	render : function()
 	{
 		CameraManager.activateCamera("perspective_OC");
+		
 		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	}
 };
