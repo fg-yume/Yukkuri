@@ -15,12 +15,7 @@ var app = app || {};
 
 app.reflection = {
 	dt: 1/60,
-	//controls: undefined,
-	plane: undefined,
 	
-	mirrorEffectSphere1: undefined,
-	mirrorEffectSphereCamera1: undefined,
-
 	/*
 	 * Calls functions necessary to load and initialize necessary components
 	 * in order for the scene to show up
@@ -29,7 +24,7 @@ app.reflection = {
 	 */
 	init : function() 
 	{
-		console.log('init called');
+		console.log('reflection entry!');
 		
 		this.initThree();
 		this.loadAndCreateAssets();

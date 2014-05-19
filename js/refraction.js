@@ -14,9 +14,8 @@
 var app = app || {};
 
 app.refraction = {
-	dt      : 1/60,      // handles FPS
-	//controls: undefined, // the first person controls that will be used
-	ready   : false,     // if the experiment is ready to play
+	dt      : 1/60,  // handles FPS
+	ready   : false, // if the experiment is ready to play
 	
 	/*
 	 * Calls functions necessary to load and initialize necessary components
