@@ -25,6 +25,12 @@ app.water = {
 	showGrid: true,
 	count: 0.0,
 	
+	/*
+	 * Calls functions necessary to load and initialize necessary components
+	 * in order for the scene to show up
+	 *
+	 * @return  none
+	 */
 	init : function() 
 	{
 		console.log('water entry!');
@@ -34,6 +40,12 @@ app.water = {
 		this.createWorld();
 	},
 	
+	/*
+	 * Initializes the threejs components that will be needed for this 
+	 * experiment
+	 *
+	 * @return  none
+	 */
 	initThree : function()
 	{
 		// Scene ----------------------------------------------------------
@@ -61,6 +73,11 @@ app.water = {
 		app.main.controls.autoForward   = false;
 	},
 	
+	/*
+	 * Loads and creates assets for the experience
+	 *
+	 * @return  none
+	 */
 	loadAndCreateAssets : function()
 	{
 		// Geometry ------------------------------------------------------
@@ -80,7 +97,7 @@ app.water = {
 		if(this.showGrid)
 		{
 			var geo2 = new THREE.PlaneGeometry(1000, 1000, 49, 49);
-			Resources.addGeometry(geo, "water_debug");
+			Resources.addGeometry(geo2, "water_debug");
 		}
 		
 		Resources.addGeometry(geo, "water_plane");
@@ -149,6 +166,12 @@ app.water = {
 		Resources.addMaterial(skyboxMaterial, "water_skybox");
 	},
 	
+	/*
+	 * Handles additional asset creation and adds all objects to
+	 * the experience
+	 *
+	 * @return  none
+	 */
 	createWorld : function()
 	{
 		// Objects -------------------------------------------------------
@@ -206,6 +229,11 @@ app.water = {
 		this.ready = true;
 	},
     	
+	/*
+	 * Updates all of the objects in the experience
+	 *
+	 * @return  none
+	 */
     update: function()
 	{
 		// UPDATE
@@ -238,11 +266,15 @@ app.water = {
 		this.customUniforms.time.value += this.dt;
 	},
 	
+	/* 
+	 * Renders all of the objects in the experience
+	 *
+	 * @return  none
+	 */
 	render : function()
 	{
 		SceneManager.activateScene("perspective");
 		CameraManager.activateCamera("perspective_FPC");
 		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	}
-
 };

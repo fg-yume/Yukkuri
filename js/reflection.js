@@ -66,6 +66,11 @@ app.reflection = {
 		app.main.controls.autoForward   = false;
 	},
 	
+	/*
+	 * Loads and creates assets for the experience
+	 *
+	 * @return  none
+	 */
 	loadAndCreateAssets : function()
 	{
 		// Geometry --------------------------------------------------------
@@ -217,11 +222,21 @@ app.reflection = {
 		this.ready = true;
 	},
 	
+	/*
+	 * Updates all of the objects in the experience
+	 *
+	 * @return  none
+	 */
 	update: function()
 	{
 		app.main.controls.update(this.dt);	
 	},
 	
+	/* 
+	 * Renders all of the objects in the experience
+	 *
+	 * @return  none
+	 */
 	render: function()
 	{	
 		SceneManager.activateScene("perspective");
