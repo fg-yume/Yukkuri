@@ -14,191 +14,235 @@ var app = app || {};
 
 app.water = {
 	// variable properties
-	myobjects: [],
 	dt: 1/60,
 	ox: [],
 	oy: [],
 	or: [],
 	oz: [],
 	customUniforms: undefined,
-	customMaterial: undefined,
+	ready : false,
 	
 	showGrid: true,
-	gridplane: undefined,
 	count: 0.0,
 	
 	init : function() 
 	{
 		console.log('water entry!');
-		this.setupThreeJS();
-		this.setupWorld();
-		this.update();
-	},
-    	
-    update: function()
-	{
-		// schedule next animation frame
-		app.animationID = requestAnimationFrame(this.update.bind(this));
-
-		// UPDATE
-		this.controls.update(this.dt);
-
-		//////////////////////////////////////////////////////////////////////
-		for(var i = 0; i < this.geo.vertices.length;i++)
-		{
-			this.geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/100 * Math.PI)*3);
-			this.geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/100 * Math.PI)*3);
-			//this.geo.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5);
-			this.geo.vertices[i].z = -(Math.sin(((i+this.count)/400)*Math.PI) * 10);
-			
-			if(this.showGrid)
-			{
-				this.geo2.vertices[i].x = this.geo.vertices[i].x;
-				this.geo2.vertices[i].y = this.geo.vertices[i].y;
-				this.geo2.vertices[i].z = this.geo.vertices[i].z + 400;
-			}
-		}
-		this.count+=2;
-		this.geo.verticesNeedUpdate = true;
-		if(this.showGrid)
-		{
-			this.geo2.verticesNeedUpdate = true;
-		}
-		//////////////////////////////////////////////////////////////////////
 		
-		this.customUniforms.time.value += this.dt;
-		
-		// DRAW	
-		this.renderer.render(this.scene, this.camera);
+		this.initThree();
+		this.loadAndCreateAssets();
+		this.createWorld();
 	},
 	
-	setupThreeJS: function() 
+	initThree : function()
 	{
-		this.scene = new THREE.Scene();
-		//this.scene.fog = new THREE.FogExp2(0xADBEED, 0.002);
-
-		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-		this.camera.position.y = 300;
-		this.camera.position.z = 0;
-		this.camera.position.x = -800;
-
-		this.renderer = new THREE.WebGLRenderer({antialias: true});
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
-		this.renderer.shadowMapEnabled = true;
-		this.renderer.setClearColor( 0x000000, 1);
-		document.body.appendChild(this.renderer.domElement );
-
-		this.controls = new THREE.FirstPersonControls(this.camera);
-		this.controls.movementSpeed = 300;
-		this.controls.lookSpeed = .2;
-		this.controls.autoForward = false;
-		this.camera.lookAt(100,-100,100);
+		// Scene ----------------------------------------------------------
+		SceneManager.activateScene("perspective");
 		
-		//THREE.ImageUtils.crossOrigin = "anonymous";
-	},
-			
-	setupWorld: function() 
-	{
-
-		var baseTexture = new THREE.ImageUtils.loadTexture( "images/water.jpg" );
-		baseTexture.wrapS = baseTexture.wrapT = THREE.RepeatWrapping; 
-
-		var noiseTexture = new THREE.ImageUtils.loadTexture( "images/noise1.png" );
-		noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping; 
-
-		var blendTexture = new THREE.ImageUtils.loadTexture( "images/waterblend.png" );
-		blendTexture.wrapS = blendTexture.wrapT = THREE.RepeatWrapping; 
+		// Camera ---------------------------------------------------------
+		var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 		
-		this.customUniforms = {
-			baseTexture: 	{ type: "t", value: baseTexture },
-			noiseTexture:	{ type: "t", value: noiseTexture },
-			blendTexture:	{ type: "t", value: blendTexture },
-			
-			baseSpeed:		{ type: "f", value: 0.001 },
-			
-			repeatCol:		{ type: "f", value: 4 },
-			repeatRow:		{ type: "f", value: 4 },
-			
-			noiseScale:		{ type: "f", value:  .8 },
-			
-			blendSpeed: 	{ type: "f", value: 0.01 },
-			blendOffset: 	{ type: "f", value: 0.6 },
-			
-			alpha: 			{ type: "f", value: 1.0 },
-			time: 			{ type: "f", value: 1.0 }
+		var properties = {
+			position : {x: -800, y: 300, z: 0},
+			lookAt   : new THREE.Vector3(100, -100, 100)
 		};
 		
+		CameraManager.addCamera(camera, "perspective_FPC");
+		CameraManager.modifyCamera(properties, "perspective_FPC");
 		
-		this.geo = new THREE.PlaneGeometry(1000,1000,49,49);
+		// Renderer -------------------------------------------------------
+		app.main.renderer.setClearColor(0x000000);
 		
-		this.customMaterial = new THREE.ShaderMaterial( 
+		// Controls -------------------------------------------------------
+		app.main.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
+		
+		app.main.controls.movementSpeed = 300;
+		app.main.controls.lookSpeed     = .2;
+		app.main.controls.autoForward   = false;
+	},
+	
+	loadAndCreateAssets : function()
+	{
+		// Geometry ------------------------------------------------------
+		var geo = new THREE.PlaneGeometry(1000, 1000, 49, 49);
+		
+		for(var i = 0; i < geo.vertices.length;i++)
 		{
-			uniforms: this.customUniforms,
-			vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-		}   );
-		
-		for(var i = 0; i < this.geo.vertices.length;i++)
-		{
-			this.ox[i] = this.geo.vertices[i].x;
-			this.oy[i] = this.geo.vertices[i].y;
-			this.oz[i] = -Math.sin((i%50)*Math.PI);
+			this.ox[i] = geo.vertices[i].x;
+			this.oy[i] = geo.vertices[i].y;
+			this.oz[i] = -Math.sin( (i%50) * Math.PI );
 			this.or[i] = Math.random() * 1000;
 		}
 		
-		this.plane = new THREE.Mesh(this.geo,this.customMaterial);
+		console.log(geo.vertices.length);
 		
-		this.plane.rotation.x=-0.5*Math.PI;
-		
-		this.scene.add(this.plane);
-		
+		// debug grid
 		if(this.showGrid)
 		{
-			this.geo2 = new THREE.PlaneGeometry(1000,1000,49,49);
-			var mat = new THREE.MeshPhongMaterial({color: 0x666666, wireframe: true});
-			
-			this.gridplane = new THREE.Mesh(this.geo2,mat);
-			this.gridplane.rotation.x=-0.5*Math.PI;
-			this.scene.add(this.gridplane);
+			var geo2 = new THREE.PlaneGeometry(1000, 1000, 49, 49);
+			Resources.addGeometry(geo, "water_debug");
 		}
 		
+		Resources.addGeometry(geo, "water_plane");
+		
+		// Textures ------------------------------------------------------
+		var baseTexture  = new THREE.ImageUtils.loadTexture( "resources/water/textures/water.jpg" );
+		baseTexture.wrapS = baseTexture.wrapT = THREE.RepeatWrapping; 
+		
+		var noiseTexture = new THREE.ImageUtils.loadTexture( "resources/water/textures/noise1.png" );
+		noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping; 
+		
+		var blendTexture = new THREE.ImageUtils.loadTexture( "resources/water/textures/waterblend.png" );
+		blendTexture.wrapS = blendTexture.wrapT = THREE.RepeatWrapping; 
+		
+		var skyboxTexture = new THREE.ImageUtils.loadTexture("resources/water/textures/checker.png");
+		
+		Resources.addTexture(baseTexture, "water_base");
+		Resources.addTexture(noiseTexture, "water_noise");
+		Resources.addTexture(blendTexture, "water_blend");
+		Resources.addTexture(skyboxTexture, "water_skybox");
+		
+		// Materials -----------------------------------------------------
+		
+		// shader material
+		this.customUniforms = {
+			baseTexture  : { type: "t", value: baseTexture },
+			noiseTexture : { type: "t", value: noiseTexture },
+			blendTexture : { type: "t", value: blendTexture },
+			
+			baseSpeed    : { type: "f", value: 0.001 },
+			
+			repeatCol    : { type: "f", value: 4 },
+			repeatRow    : { type: "f", value: 4 },
+			
+			noiseScale   : { type: "f", value:  .8 },
+			
+			blendSpeed   : { type: "f", value: 0.01 },
+			blendOffset  : { type: "f", value: 0.6 },
+			
+			alpha        : { type: "f", value: 1.0 },
+			time         : { type: "f", value: 1.0 }
+		};
+		
+		var customMaterial = new THREE.ShaderMaterial(
+		{
+			uniforms: this.customUniforms,
+			vertexShader: document.querySelector( "#vertexShader" ).textContent,
+			fragmentShader: document.querySelector( "#fragmentShader" ).textContent
+		});
+		
+		// skybox material
 		var materialArray = [];
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/checker.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: Resources.getTexture("water_skybox") }));
+		
 		for (var i = 0; i < 6; i++)
 		   materialArray[i].side = THREE.BackSide;
+		   
 		var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
-		var skyboxGeom = new THREE.CubeGeometry( 5000, 5000, 5000, 1, 1, 1 );
-		var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
-		this.scene.add( skybox );
 		
+		Resources.addMaterial(customMaterial, "water_shader");
+		Resources.addMaterial(skyboxMaterial, "water_skybox");
+	},
+	
+	createWorld : function()
+	{
+		// Objects -------------------------------------------------------
+		var skyboxGeom = new THREE.BoxGeometry(5000, 5000, 5000, 1, 1, 1);
+		
+		// water plane
+		var plane = new THREE.Mesh(Resources.getGeometry("water_plane"), Resources.getMaterial("water_shader"));
+		plane.rotation.x = -0.5 * Math.PI;
+		
+		// debug grid
+		if(this.showGrid)
+		{
+			var mat = new THREE.MeshPhongMaterial({color: 0x66666, wireframe: true});
+			
+			var gridPlane = new THREE.Mesh(Resources.getGeometry("water_debug"), mat);
+			gridPlane.rotation.x = -0.5 * Math.PI;
+			
+			Resources.addObject(gridPlane, "water_debug");
+		}
+		
+		var skybox = new THREE.Mesh(skyboxGeom, Resources.getMaterial("water_skybox"));
+		
+		Resources.addObject(plane, "water_normal");
+		Resources.addObject(skybox, "water_skybox");
+		
+		// Lights --------------------------------------------------------
 		var light = new THREE.DirectionalLight(0xffffff,4);
 		light.position.set(500,500,500);
-		light.castShadow = true;
-		light.shadowMapWidth = 2048;
-		light.shadowMapHeight = 2048;
-		light.shadowCameraVisible	= true;
+		light.castShadow          = true;
+		light.shadowMapWidth      = 2048;
+		light.shadowMapHeight     = 2048;
+		light.shadowCameraVisible = true;
 		
 		var d = 1000;
-		light.shadowCameraLeft = d;
-		light.shadowCameraTop = d;
-		
-		light.shadowCameraRight = -d;
+		light.shadowCameraLeft   = d;
+		light.shadowCameraTop    = d;
+		light.shadowCameraRight  = -d;
 		light.shadowCameraBottom = -d;
-		
-		light.shadowCameraFar = 2500;
-		
-		this.scene.add(light);
-		
-		console.log(this.geo.vertices.length);
+		light.shadowCameraFar    = 2500;
 		
 		var pointlight = new THREE.PointLight(0xffffff, 1, 100 );
 		pointlight.position.set(0,600,0);
 		pointlight.shadowCameraVisible	= true;
-		this.scene.add(pointlight);
+		
+		// Scene Additions -----------------------------------------------
+		SceneManager.addToScene(plane, "perspective");
+		SceneManager.addToScene(skybox, "perspective");
+		SceneManager.addToScene(light, "perspective");
+		SceneManager.addToScene(pointlight, "perspective");
+		
+		// debug grid
+		if(this.showGrid)
+			SceneManager.addToScene(gridPlane, "perspective");
+			
+		this.ready = true;
+	},
+    	
+    update: function()
+	{
+		// UPDATE
+		app.main.controls.update(this.dt);
+		
+		var geo  = Resources.getGeometry("water_plane");
+		var geo2 = Resources.getGeometry("water_debug");
+
+		for(var i = 0; i < geo.vertices.length; i++)
+		{
+			geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/100 * Math.PI)*3);
+			geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/100 * Math.PI)*3);
+			//this.geo.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5);
+			geo.vertices[i].z = -(Math.sin(((i+this.count)/400)*Math.PI) * 10);
+			
+			if(this.showGrid)
+			{
+				geo2.vertices[i].x = geo.vertices[i].x;
+				geo2.vertices[i].y = geo.vertices[i].y;
+				geo2.vertices[i].z = geo.vertices[i].z + 400;
+			}
+		}
+		
+		this.count += 2;
+		geo.verticesNeedUpdate = true;
+		
+		if(this.showGrid)
+			geo2.verticesNeedUpdate = true;
+		
+		this.customUniforms.time.value += this.dt;
+	},
+	
+	render : function()
+	{
+		SceneManager.activateScene("perspective");
+		CameraManager.activateCamera("perspective_FPC");
+		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	}
+
 };

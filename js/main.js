@@ -177,7 +177,7 @@ app.main = {
 				this.intersect00 = null;
 			
 				console.log("going to lizard!");
-				this.changeGameState(app.STATE.REFLECTION);
+				this.changeGameState(app.STATE.WATER);
 				
 				// remove items from scene
 				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
@@ -192,8 +192,8 @@ app.main = {
 				else
 					console.log("not proper remove from ortho!");
 				
-				// begin reflection
-				app.reflection.init();	
+				// begin water
+				app.water.init();	
 			}
 			
 			if(this.intersectOBJ)
@@ -327,6 +327,13 @@ app.main = {
 				app.reflection.update();
 				
 			break;
+			
+		case app.STATE.WATER:
+		
+			if(app.water.ready)
+				app.water.update();
+		
+			break;
 				
 		default:
 			break;
@@ -387,6 +394,14 @@ app.main = {
 			}
 		
 			break;
+			
+		case app.STATE.WATER:
+		
+			if(app.water.ready)
+			{
+				this.renderer.clear();
+				app.water.render();
+			}
 			
 		default:
 			break;
