@@ -26,11 +26,13 @@ app.animationID = undefined;
 	queue.loadFile("js/lib/Detector.js");
 	queue.loadFile("js/lib/OrbitControls.js");
 	queue.loadFile("js/lib/FirstPersonControls.js");
+	queue.loadFile("js/lib/dat.gui.js");
 	queue.loadFile("js/utils/input.js");
 	queue.loadFile("js/utils/ResourceManager.js");
 	queue.loadFile("js/utils/SceneManager.js");
 	queue.loadFile("js/utils/CameraManager.js");
 	queue.loadFile("js/utils/utilities.js");
+	queue.loadFile("js/core/Button.js");
 	//queue.loadFile("js/core/moveLight.js");
 	queue.loadFile("js/lizard.js");
 	queue.loadFile("js/refraction.js");
@@ -59,7 +61,7 @@ app.animationID = undefined;
 			cancelAnimationFrame(app.animationID);
 			
 			// draw the updated screen
-			//app.main.render();
+			app.main.render();
 		 }, false);
 		 
 		 /*

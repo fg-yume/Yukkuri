@@ -37,6 +37,7 @@ app.main = {
 	intersectOBJ	: undefined,
 	intersectOO		: undefined,
 	testColor		: {"original": 0xff9fff, "hover": 0x33DDF1},
+	buttons			: new Array(),    // holds all of the buttons that will lead to the various experiences	
 	
 	/*
 	 * Updates the renderer and camera properties to match the new width and height values of the window
@@ -149,21 +150,38 @@ app.main = {
 		
 		var test_material = new THREE.SpriteMaterial({color: this.testColor.original});
 		
-		this.sprite = new THREE.Sprite(test_material);
+		// Objects ---------------------------------------------------
+		/*this.sprite = new THREE.Sprite(test_material);
 		this.sprite.position.set(100, -200, -5);
-		//sprite.position.normalize(); // not sure why
-		this.sprite.scale.set(100, 100, 1.0);
+		this.sprite.scale.set(100, 100, 1.0);*/
+		var properties = {
+			center : {x: 50, y: -100, z: -5},
+			size   : {height: 100, width: 100, depth: 1},
+			color  : {main: "0x33AABB", hover: "0x33BBFF", click: "0x99BBFF"},
+			id     : "test_sprite",
+			click_callback : function(){
+				this.changeState(BUTTON_STATE.CLICK); // should be "button" this
+				
+				app.main.unload();
+				app.main.changeGameState(app.STATE.LIZARD);
+				app.lizard.init();
+			},
+			hover_callback : function(){
+				this.changeState(BUTTON_STATE.HOVER); // should be "button" this
+			}
+		};
+		
+		this.sprite = new app.Button(properties);
 		
 		var sphere_mat = new THREE.MeshBasicMaterial({color: 0x0F0FF0});
 		var sphere_geo = new THREE.SphereGeometry(5, 10, 10);
 		
 		this.sphere_mesh = new THREE.Mesh(sphere_geo, sphere_mat);
 		
-		//this.scene.add(this.sphere_mesh);
-		//this.sceneOrtho.add(this.sprite);
-		//this.scene.add(sprite);
+		// Scene Additions ---------------------------------------------
 		SceneManager.addToScene(this.sphere_mesh, "perspective");
-		SceneManager.addToScene(this.sprite, "orthographic");
+		//SceneManager.addToScene(this.sprite, "orthographic");
+		SceneManager.addToScene(this.sprite.mesh, "orthographic");
 		
 		this.animate();
 	},
@@ -175,26 +193,15 @@ app.main = {
 			// have to be hovering above our "button"
 			if(this.intersectOO)
 			{
-				this.intersect00 = null;
+				// check button array
+				if(this.intersectOO == this.sprite.mesh)
+				{
+					this.sprite.click_callback();
+				}
+				
+				this.intersectOO = null;
 			
-				console.log("going to lizard!");
-				this.changeGameState(app.STATE.WATER);
-				
-				// remove items from scene
-				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
-					console.log("proper remove from perspective");
-					
-				else
-					console.log("not proper remove from perspective!");
-				
-				if(SceneManager.removeFromScene(this.sprite, "orthographic"))
-					console.log("proper remove from ortho");
-					
-				else
-					console.log("not proper remove from ortho!");
-				
-				// begin water
-				app.water.init();	
+				console.log("button click!");
 			}
 			
 			if(this.intersectOBJ)
@@ -221,6 +228,17 @@ app.main = {
 				app.refraction.init();
 			}
 		}
+	},
+	
+	/*
+	 * Removes all elements in this screen from the THREE.Scene
+	 *
+	 * @return  none
+	 */
+	unload : function()
+	{
+		SceneManager.removeFromScene(this.sphere_mesh, "perspective");
+		SceneManager.removeFromScene(this.sprite.mesh, "orthographic");
 	},
 	
 	/*
@@ -280,31 +298,46 @@ app.main = {
 			ray = this.projector.pickingRay(vector, CameraManager.getCamera("orthographic"));
 			
 			intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
+			
+			// orthographic intersections
 			if(intersects.length > 0)
 			{
-				//console.log("ortho intersect");
-				
+				// if intersecting object is different from previous frame
 				if(this.intersectOO != intersects[0].object)
 				{
 					// revert previously intersected object
-					if(this.intersectOO)
+					if(this.intersectOO && this.intersectOO != this.sprite.mesh)
 					{
+						// check sprite array
+					
 						this.intersectOO.material.color.setHex(this.testColor.original);
 					}
 						
 					// change new intersected object
 					this.intersectOO = intersects[0].object;
-					this.intersectOO.material.color.setHex(this.testColor.hover);
+					
+					if(this.intersectOO == this.sprite.mesh)
+					{
+						//console.log("change button state");
+						this.sprite.hover_callback();
+					}
+					else
+					{
+						console.log("bad object!");
+					}
 				}
 			}
 			
 			else
 			{
-				if(this.intersectOO)
-					this.intersectOO.material.color.setHex(this.testColor.original);
+				if(this.intersectOO && this.intersectOO == this.sprite.mesh)
+					this.sprite.changeState(BUTTON_STATE.MAIN);
 					
 				this.intersectOO = null;
 			}
+			
+			// update buttons
+			this.sprite.update();
 			
 			break;
 				
