@@ -34,13 +34,13 @@ app.main = {
 	controls		: undefined, 	  // camera controls for the scene
 	currentState	: app.STATE.MAIN, // current state of the application
 	previousState	: app.STATE.MAIN, // previous state of the application
-	intersectOBJ	: undefined,
-	intersectOO		: undefined,
-	testColor		: {"original": 0xff9fff, "hover": 0x33DDF1},
+	intersectOO		: undefined,      // the button being hovered
 	buttons			: new Array(),    // holds all of the buttons that will lead to the various experiences	
 	
 	/*
 	 * Updates the renderer and camera properties to match the new width and height values of the window
+	 *
+	 * TODO: Handle all possible cameras!
 	 *
 	 * @return	none
 	 */
@@ -146,19 +146,12 @@ app.main = {
 	 */
 	createWorld : function()
 	{
-		var test_diffuse = new THREE.ImageUtils.loadTexture("resources/lizard/textures/ground_normal.png");
-		
-		var test_material = new THREE.SpriteMaterial({color: this.testColor.original});
-		
 		// Objects ---------------------------------------------------
-		/*this.sprite = new THREE.Sprite(test_material);
-		this.sprite.position.set(100, -200, -5);
-		this.sprite.scale.set(100, 100, 1.0);*/
-		var properties = {
+		var prop_lizard = {
 			center : {x: 50, y: -100, z: -5},
 			size   : {height: 100, width: 100, depth: 1},
 			color  : {main: "0x33AABB", hover: "0x33BBFF", click: "0x99BBFF"},
-			id     : "test_sprite",
+			id     : "button_lizard",
 			click_callback : function(){
 				this.changeState(BUTTON_STATE.CLICK); // should be "button" this
 				
@@ -171,17 +164,52 @@ app.main = {
 			}
 		};
 		
-		this.sprite = new app.Button(properties);
+		var prop_water = {
+			center : {x: 50, y: -250, z: -5},
+			size   : {height: 100, width: 100, depth: 1},
+			color  : {main: "0xBB3DAC", hover: "0xFF3DAC", click: "0x99BBFF"},
+			id     : "button_water",
+			click_callback : function(){
+				this.changeState(BUTTON_STATE.CLICK); // will map to app.Button.Button
+				
+				app.main.unload();
+				app.main.changeGameState(app.STATE.WATER);
+				app.water.init();
+			},
+			hover_callback : function(){
+				this.changeState(BUTTON_STATE.HOVER); // will map to app.Button.Button
+			}
+		};
 		
-		var sphere_mat = new THREE.MeshBasicMaterial({color: 0x0F0FF0});
-		var sphere_geo = new THREE.SphereGeometry(5, 10, 10);
+		var prop_refrac = {
+			center : {x: 50, y: -500, z: -5},
+			size   : {height: 100, width: 100, depth: 1},
+			color  : {main: "0xAA1044", hover: "0x221044", click: "0x99BBFF"},
+			id     : "button_refraction",
+			cilck_callback : function(){
+				this.changeStae(BUTTON_STATE.CLICK); // will map to app.Button.Button
+				
+				app.main.unload();
+				app.main.changeGameState(app.STATE.WATER);
+				app.water.init();
+			},
+			hover_callback : function(){
+				this.changeState(BUTTON_STATE.HOVER); // will map to app.Button.Button
+			}
+		};
 		
-		this.sphere_mesh = new THREE.Mesh(sphere_geo, sphere_mat);
+		var sprite_lizard = new app.Button(prop_lizard);
+		var sprite_water  = new app.Button(prop_water);
+		var sprite_refrac = new app.Button(prop_refrac);
+		
+		this.buttons.push(sprite_lizard);
+		this.buttons.push(sprite_water);
+		this.buttons.push(sprite_refrac);
 		
 		// Scene Additions ---------------------------------------------
-		SceneManager.addToScene(this.sphere_mesh, "perspective");
-		//SceneManager.addToScene(this.sprite, "orthographic");
-		SceneManager.addToScene(this.sprite.mesh, "orthographic");
+		SceneManager.addToScene(sprite_lizard.getMesh(), "orthographic");
+		SceneManager.addToScene(sprite_water.getMesh(), "orthographic");
+		SceneManager.addToScene(sprite_refrac.getMesh(), "orthographic");
 		
 		this.animate();
 	},
@@ -194,38 +222,15 @@ app.main = {
 			if(this.intersectOO)
 			{
 				// check button array
-				if(this.intersectOO == this.sprite.mesh)
+				for(var i = 0; i < this.buttons.length; i++)
 				{
-					this.sprite.click_callback();
+					if(this.intersectOO == this.buttons[i].mesh)
+						this.buttons[i].click_callback();
 				}
 				
 				this.intersectOO = null;
 			
 				console.log("button click!");
-			}
-			
-			if(this.intersectOBJ)
-			{
-				this.intersectOBJ = null;
-				
-				console.log("going to refraction!");
-				this.changeGameState(app.STATE.REFRACTION);
-				
-				// remove items from scene
-				if(SceneManager.removeFromScene(this.sphere_mesh, "perspective"))
-					console.log("proper remove from perspective");
-					
-				else
-					console.log("not proper remove from perspective!");
-				
-				if(SceneManager.removeFromScene(this.sprite, "orthographic"))
-					console.log("proper remove from ortho");
-					
-				else
-					console.log("not proper remove from ortho!");
-					
-				// begin refraction
-				app.refraction.init();
 			}
 		}
 	},
@@ -237,8 +242,9 @@ app.main = {
 	 */
 	unload : function()
 	{
-		SceneManager.removeFromScene(this.sphere_mesh, "perspective");
-		SceneManager.removeFromScene(this.sprite.mesh, "orthographic");
+		// remove buttons from scene
+		for(var i = 0; i < this.buttons.length; i++)
+			SceneManager.removeFromScene(this.buttons[i].mesh, "orthographic");
 	},
 	
 	/*
@@ -253,51 +259,12 @@ app.main = {
 		case app.STATE.MAIN:
 			this.controls.update(1/60);
 			
-			// Perspective Camera -----------------------------------------
-			var vector = new THREE.Vector3(Input.mouseX, Input.mouseY, 1.0);
-			this.projector.unprojectVector(vector, CameraManager.getCamera("perspective_OC"));
-			
-			//console.log("mpos: " + Input.mouseX + ", " + Input.mouseY);
-			
-			var ray = new THREE.Raycaster(CameraManager.getCamera("perspective_OC").position, vector.sub(CameraManager.getCamera("perspective_OC").position).normalize());
-			
-			// grab the list of objects that intersect with the ray
-			var intersects = ray.intersectObjects(SceneManager.getScene("perspective").children);
-			
-			// if we have intersections
-			if(intersects.length > 0)
-			{
-				//console.log("no-ortho intersects");
-				
-				if(this.intersectOBJ != intersects[0].object)
-				{
-					// revert previously intersected object
-					if(this.intersectOBJ)
-					{
-						this.intersectOBJ.material.color.setHex(this.testColor.original);
-					}
-						
-					// change new intersected object
-					this.intersectOBJ = intersects[0].object;
-					this.intersectOBJ.material.color.setHex(this.testColor.hover);
-				}
-			}
-			
-			// reset previous intersection otherwise
-			else
-			{
-				if(this.intersectOBJ)
-					this.intersectOBJ.material.color.setHex(this.testColor.original);
-					
-				this.intersectOBJ = null;
-			}
-			
 			// Orthographic camera ----------------------------------------
-			vector = new THREE.Vector3(Input.mouseX, Input.mouseY * - 1, 0.5);
+			var vector = new THREE.Vector3(Input.mouseX, Input.mouseY * - 1, 0.5);
 			
-			ray = this.projector.pickingRay(vector, CameraManager.getCamera("orthographic"));
+			var ray = this.projector.pickingRay(vector, CameraManager.getCamera("orthographic"));
 			
-			intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
+			var intersects = ray.intersectObjects(SceneManager.getScene("orthographic").children);
 			
 			// orthographic intersections
 			if(intersects.length > 0)
@@ -306,38 +273,40 @@ app.main = {
 				if(this.intersectOO != intersects[0].object)
 				{
 					// revert previously intersected object
-					if(this.intersectOO && this.intersectOO != this.sprite.mesh)
+					for(var i = 0; i < this.buttons.length; i++)
 					{
-						// check sprite array
-					
-						this.intersectOO.material.color.setHex(this.testColor.original);
+						if(this.intersectOO == this.buttons[i].mesh)
+							this.buttons[i].changeState(BUTTON_STATE.MAIN);
 					}
 						
 					// change new intersected object
 					this.intersectOO = intersects[0].object;
 					
-					if(this.intersectOO == this.sprite.mesh)
+					for(var i = 0; i < this.buttons.length; i++)
 					{
-						//console.log("change button state");
-						this.sprite.hover_callback();
-					}
-					else
-					{
-						console.log("bad object!");
+						if(this.intersectOO == this.buttons[i].mesh)
+							this.buttons[i].hover_callback();
 					}
 				}
 			}
 			
 			else
 			{
-				if(this.intersectOO && this.intersectOO == this.sprite.mesh)
-					this.sprite.changeState(BUTTON_STATE.MAIN);
+				if(this.intersectOO)
+				{
+					for(var i = 0; i < this.buttons.length; i++)
+					{
+						if(this.intersectOO == this.buttons[i].mesh)
+							this.buttons[i].changeState(BUTTON_STATE.MAIN);
+					}
+				}
 					
 				this.intersectOO = null;
 			}
 			
 			// update buttons
-			this.sprite.update();
+			for(var i = 0; i < this.buttons.length; i++)
+				this.buttons[i].update();
 			
 			break;
 				
