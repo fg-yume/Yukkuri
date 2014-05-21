@@ -182,34 +182,55 @@ app.main = {
 		};
 		
 		var prop_refrac = {
-			center : {x: 50, y: -500, z: -5},
+			center : {x: -100, y: -250, z: -5},
 			size   : {height: 100, width: 100, depth: 1},
-			color  : {main: "0xAA1044", hover: "0x221044", click: "0x99BBFF"},
-			id     : "button_refraction",
-			cilck_callback : function(){
-				this.changeStae(BUTTON_STATE.CLICK); // will map to app.Button.Button
+			color  : {main: "0x5500FF", hover: "0x5555FF", click: "0x99BBFF"},
+			id     : "button_refrac",
+			click_callback : function(){
+				this.changeState(BUTTON_STATE.CLICK); // will map to app.Button.Button
 				
 				app.main.unload();
-				app.main.changeGameState(app.STATE.WATER);
-				app.water.init();
+				app.main.changeGameState(app.STATE.REFRACTION);
+				app.refraction.init();
 			},
 			hover_callback : function(){
 				this.changeState(BUTTON_STATE.HOVER); // will map to app.Button.Button
 			}
 		};
 		
+		var prop_reflec = {
+			center : {x: -100, y: -100, z: -5},
+			size   : {height: 100, width: 100, depth: 1},
+			color  : {main: "0xDD1199", hover: "0xDDFF99", click: "0x99BBFF"},
+			id     : "button_reflec",
+			click_callback : function(){
+				this.changeState(BUTTON_STATE.CLICK); // will map to app.Button.Button
+				
+				app.main.unload();
+				app.main.changeGameState(app.STATE.REFLECTION);
+				app.reflection.init();
+			},
+			hover_callback : function(){
+				this.changeState(BUTTON_STATE.HOVER); // will map to app.Button.Button
+			}
+		};
+		
+		
 		var sprite_lizard = new app.Button(prop_lizard);
 		var sprite_water  = new app.Button(prop_water);
 		var sprite_refrac = new app.Button(prop_refrac);
+		var sprite_reflec = new app.Button(prop_reflec);
 		
 		this.buttons.push(sprite_lizard);
 		this.buttons.push(sprite_water);
 		this.buttons.push(sprite_refrac);
+		this.buttons.push(sprite_reflec);
 		
 		// Scene Additions ---------------------------------------------
 		SceneManager.addToScene(sprite_lizard.getMesh(), "orthographic");
 		SceneManager.addToScene(sprite_water.getMesh(), "orthographic");
 		SceneManager.addToScene(sprite_refrac.getMesh(), "orthographic");
+		SceneManager.addToScene(sprite_reflec.getMesh(), "orthographic");
 		
 		this.animate();
 	},
@@ -290,10 +311,13 @@ app.main = {
 				}
 			}
 			
+			// no orthographic intersections
 			else
 			{
+				// if there was previously an intersection
 				if(this.intersectOO)
 				{
+					// revert to normal
 					for(var i = 0; i < this.buttons.length; i++)
 					{
 						if(this.intersectOO == this.buttons[i].mesh)
