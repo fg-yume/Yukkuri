@@ -281,7 +281,7 @@ app.main = {
 		var sprite_water  = new app.Button(prop_water);
 		var sprite_refrac = new app.Button(prop_refrac);
 		var sprite_reflec = new app.Button(prop_reflec);
-		var sprite_camera = new app.Button(prop_camera);
+		//var sprite_camera = new app.Button(prop_camera);
 		
 		this.buttons.push(sprite_lizard);
 		this.buttons.push(sprite_water);

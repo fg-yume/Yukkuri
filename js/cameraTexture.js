@@ -11,6 +11,7 @@
 var app = app || {};
 
 app.cameraTexture = {
+	scene: undefined,
 	camera: undefined,
 	paused: false,
 	dt: 1/60,
@@ -41,6 +42,7 @@ app.cameraTexture = {
 		this.setupWorld();
 	},
 	setupThreeJS: function() {
+		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 		this.camera.position.y = 300;
 		this.camera.position.z = 0;
@@ -54,6 +56,13 @@ app.cameraTexture = {
 		this.textureCamera.position.x =  this.ccx;
 		this.textureCamera.lookAt(new THREE.Vector3(0,0,0));
 		this.camera.lookAt(100,-100,100);
+		
+		CameraManager.addCamera(this.camera, "perspective_FPC");
+		// Controls ----------------------------------------------------
+		app.main.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
+		app.main.controls.movementSpeed = 600;
+		app.main.controls.lookSpeed     = .4;
+		app.main.controls.autoForward   = false;
 	},
 			
 	setupWorld: function() {
@@ -80,20 +89,22 @@ app.cameraTexture = {
 		floor.castShadow = true;
 		floor.receiveShadow = true;
 		SceneManager.addToScene(floor,"cameraTexture_floor");
+		this.scene.add(floor);
 		
 		var materialArray = [];
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
+		materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'resources/reflection/textures/defaultTexture.png' ) }));
 		for (var i = 0; i < 6; i++)
 		   materialArray[i].side = THREE.BackSide;
 		var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
 		var skyboxGeom = new THREE.CubeGeometry( 5000, 5000, 5000, 1, 1, 1 );
 		var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
 		SceneManager.addToScene( skybox,"cameraTexture_skybox");
+		this.scene.add(skybox);
 		
 		var cubeGeometry = new THREE.CubeGeometry(40,40,40);
 		var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
@@ -102,6 +113,7 @@ app.cameraTexture = {
 		this.cameraCube.position.y=this.ccy;
 		this.cameraCube.position.z=this.ccz;
 		SceneManager.addToScene( this.cameraCube,"cameraTexture_cameraCube");
+		this.scene.add(this.cameraCube);
 		
 		this.renderTarget = new THREE.WebGLRenderTarget( 512, 512, { format: THREE.RGBFormat } );
 		var screenMaterial = new THREE.MeshBasicMaterial( { map: this.renderTarget } );
@@ -123,6 +135,8 @@ app.cameraTexture = {
 		
 		SceneManager.addToScene(this.textureCameraPlane,"cameraTexture_textureCameraPlane");
 		SceneManager.addToScene(this.textureCameraPlane2,"cameraTexture_textureCameraPlane2");
+		this.scene.add(this.textureCameraPlane);
+		this.scene.add(this.textureCameraPlane2);
 		
 		var planeGeo = new THREE.PlaneGeometry(1070,550,1,1);
 		var planeMat = new THREE.MeshLambertMaterial({color: 0x000000});
@@ -132,6 +146,7 @@ app.cameraTexture = {
 		this.backplane.position.z = 0;
 		this.backplane.position.y = 500;
 		SceneManager.addToScene(this.backplane,"cameraTexture_backplane");
+		this.scene.add(this.backplane);
 		
 		var light = new THREE.DirectionalLight(0xffffff,4);
 		light.position.set(500,500,500);
@@ -150,6 +165,7 @@ app.cameraTexture = {
 		light.shadowCameraFar = 2500;
 		
 		SceneManager.addToScene(light,"cameraTexture_light");
+		this.scene.add(light);
 		
 		var spotlight = new THREE.SpotLight(0xffff00);
 		spotlight.position.set(-500,500,-500);
@@ -170,16 +186,20 @@ app.cameraTexture = {
 		var lightTarget = new THREE.Object3D();
 		lightTarget.position.set(0,0,0);
 		SceneManager.addToScene(lightTarget,"cameraTexture_lightTarget");
+		this.scene.add(lightTarget);
 		spotlight.target = lightTarget;
 		spotlight2.target = lightTarget;
 		spotlight3.target = lightTarget;
 		// must enable shadow casting ability for the light
 		spotlight.castShadow = true;
 		SceneManager.addToScene(spotlight,"cameraTexture_spotlight");
+		this.scene.add(spotlight);
 		spotlight2.castShadow = true;
 		SceneManager.addToScene(spotlight2,"cameraTexture_spotlight2");
+		this.scene.add(spotlight2);
 		spotlight3.castShadow = true;
 		SceneManager.addToScene(spotlight3,"cameraTexture_spotlight3");
+		this.scene.add(spotlight3);
 		
 		this.guiControls = new function()
 		{
@@ -217,19 +237,20 @@ app.cameraTexture = {
 	},
 	render: function()
 	{	
-	
+		SceneManager.activateScene("perspective");
+		CameraManager.activateCamera("perspective_FPC");
 		this.textureCameraPlane.visible = false;
 		this.textureCameraPlane2.visible = false;
 		this.cameraCube.visible = false;
 		this.backplane.visible = false;
 		
-		app.main.renderer.render(SceneManager.getScene(), this.textureCamera, this.renderTarget2, true);
-		app.main.renderer.render(SceneManager.getScene(), this.camera, this.renderTarget, true);
+		app.main.renderer.render(this.scene, this.textureCamera, this.renderTarget2, true);
+		app.main.renderer.render(this.scene, this.camera, this.renderTarget, true);
 		
 		this.textureCameraPlane.visible = true;
 		this.textureCameraPlane2.visible = true;
 		this.cameraCube.visible = true;
 		this.backplane.visible = true;
-		app.main.renderer.render(SceneManager.getScene(), this.camera);
+		app.main.renderer.render(SceneManager.getScene(), CameraManager.getCamera());
 	}
 };
