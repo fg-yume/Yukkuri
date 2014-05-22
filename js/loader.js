@@ -37,6 +37,7 @@ app.animationID = undefined;
 	queue.loadFile("js/lizard.js");
 	queue.loadFile("js/refraction.js");
 	queue.loadFile("js/reflection.js");
+	queue.loadFile("js/cameraTexture.js");
 	queue.loadFile("js/water.js");
 	queue.loadFile("js/main.js");
 	

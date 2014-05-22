@@ -19,7 +19,8 @@ app.STATE = {
 	"REFRACTION": 3,
 	"WATER"     : 4,
 	"REFLECTION": 5,
-	"PAUSED"	: 6,
+	"CAMERA"	: 6,
+	"PAUSED"	: 7,
 };
 
 app.main = {
@@ -36,6 +37,8 @@ app.main = {
 	previousState	: app.STATE.MAIN, // previous state of the application
 	intersectOO		: undefined,      // the button being hovered
 	buttons			: new Array(),    // holds all of the buttons that will lead to the various experiences	
+	
+	sound1			: undefined,
 	
 	/*
 	 * Updates the renderer and camera properties to match the new width and height values of the window
@@ -198,6 +201,23 @@ app.main = {
 			}
 		};
 		
+		var prop_camera = {
+			center : {x: -100, y: 50, z: -5},
+			size   : {height: 100, width: 100, depth: 1},
+			color  : {main: "0x0055FF", hover: "0x5555FF", click: "0x99BBFF"},
+			id     : "button_camera",
+			click_callback : function(){
+				this.changeState(BUTTON_STATE.CLICK); // will map to app.Button.Button
+				
+				app.main.unload();
+				app.main.changeGameState(app.STATE.CAMERA);
+				app.cameraTexture.init();
+			},
+			hover_callback : function(){
+				this.changeState(BUTTON_STATE.HOVER); // will map to app.Button.Button
+			}
+		};
+		
 		var prop_reflec = {
 			center : {x: -100, y: -100, z: -5},
 			size   : {height: 100, width: 100, depth: 1},
@@ -215,31 +235,77 @@ app.main = {
 			}
 		};
 		
+		var Sound = function ( sources, radius, volume ) {
+
+			var audio = document.createElement( 'audio' );
+
+			for ( var i = 0; i < sources.length; i ++ ) {
+
+				var source = document.createElement( 'source' );
+				source.src = sources[ i ];
+
+				audio.appendChild( source );
+
+			}
+
+			this.position = new THREE.Vector3();
+
+			this.play = function () {
+
+				audio.play();
+
+			}
+
+			this.update = function ( camera ) {
+
+				var distance = this.position.distanceTo( camera.position );
+
+				if ( distance <= radius ) {
+
+					audio.volume = volume * ( 1 - distance / radius );
+
+				} else {
+
+					audio.volume = 0;
+
+				}
+
+			}
+
+		};
+		
+		this.sound1 = new Sound( [ 'resources/sound/beep.mp3', 'resources/sound/beep.ogg' ], 1, 0.01 );
+		
 		
 		var sprite_lizard = new app.Button(prop_lizard);
 		var sprite_water  = new app.Button(prop_water);
 		var sprite_refrac = new app.Button(prop_refrac);
 		var sprite_reflec = new app.Button(prop_reflec);
+		var sprite_camera = new app.Button(prop_camera);
 		
 		this.buttons.push(sprite_lizard);
 		this.buttons.push(sprite_water);
 		this.buttons.push(sprite_refrac);
 		this.buttons.push(sprite_reflec);
+		this.buttons.push(sprite_camera);
 		
 		// Scene Additions ---------------------------------------------
 		SceneManager.addToScene(sprite_lizard.getMesh(), "orthographic");
 		SceneManager.addToScene(sprite_water.getMesh(), "orthographic");
 		SceneManager.addToScene(sprite_refrac.getMesh(), "orthographic");
 		SceneManager.addToScene(sprite_reflec.getMesh(), "orthographic");
+		SceneManager.addToScene(sprite_camera.getMesh(), "orthographic");
 		
 		this.animate();
 	},
 	
 	onMouseDown : function()
 	{
+		this.sound1.play();
 		if(this.currentState == app.STATE.MAIN)
 		{
 			// have to be hovering above our "button"
+			
 			if(this.intersectOO)
 			{
 				// check button array
@@ -355,6 +421,13 @@ app.main = {
 				
 			break;
 			
+		case app.STATE.CAMERA:
+		
+			if(app.cameraTexture.ready)
+				app.cameraTexture.update();
+				
+			break;
+			
 		case app.STATE.WATER:
 		
 			if(app.water.ready)
@@ -423,6 +496,16 @@ app.main = {
 			{
 				this.renderer.clear();
 				app.reflection.render();
+			}
+		
+			break;
+			
+		case app.STATE.CAMERA:
+		
+			if(app.cameraTexture.ready)
+			{
+				this.renderer.clear();
+				app.cameraTexture.render();
 			}
 		
 			break;
