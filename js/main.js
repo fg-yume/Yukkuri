@@ -283,7 +283,7 @@ app.main = {
 		var sprite_reflec = new app.Button(prop_reflec);
 		var sprite_camera = new app.Button(prop_camera);
 		
-		this.buttons.push(sprite_lizard);
+		//this.buttons.push(sprite_lizard);
 		this.buttons.push(sprite_water);
 		this.buttons.push(sprite_refrac);
 		this.buttons.push(sprite_reflec);
