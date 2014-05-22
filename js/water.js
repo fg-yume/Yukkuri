@@ -25,6 +25,9 @@ app.water = {
 	showGrid: true,
 	count: 0.0,
 	
+	guiControls: undefined,
+	gui: undefined,
+	
 	/*
 	 * Calls functions necessary to load and initialize necessary components
 	 * in order for the scene to show up
@@ -66,11 +69,11 @@ app.water = {
 		app.main.renderer.setClearColor(0x000000);
 		
 		// Controls -------------------------------------------------------
-		app.main.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
+		/*app.main.controls = new THREE.FirstPersonControls(CameraManager.getCamera("perspective_FPC"));
 		
 		app.main.controls.movementSpeed = 300;
 		app.main.controls.lookSpeed     = .2;
-		app.main.controls.autoForward   = false;
+		app.main.controls.autoForward   = false;*/
 	},
 	
 	/*
@@ -164,6 +167,19 @@ app.water = {
 		
 		Resources.addMaterial(customMaterial, "water_shader");
 		Resources.addMaterial(skyboxMaterial, "water_skybox");
+		
+		this.guiControls = new function()
+		{
+			this.speed = 3;
+			this.waves = 4;
+			this.height = 10;
+		};
+		
+		this.gui = new dat.GUI();
+		this.gui.add(this.guiControls, 'speed', 0, 10);
+		this.gui.add(this.guiControls, 'waves', 1, 6);
+		this.gui.add(this.guiControls, 'height', 0, 20);
+		this.gui.open();
 	},
 	
 	/*
@@ -244,10 +260,10 @@ app.water = {
 
 		for(var i = 0; i < geo.vertices.length; i++)
 		{
-			geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/100 * Math.PI)*3);
-			geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/100 * Math.PI)*3);
+			geo.vertices[i].x = this.ox[i] +(Math.sin((this.count + this.or[i])/(Math.floor(this.guiControls.waves) * 25) * Math.PI)*3);
+			geo.vertices[i].y = this.oy[i] +(Math.cos((this.count + this.or[i])/(Math.floor(this.guiControls.waves) * 25) * Math.PI)*3);
 			//this.geo.vertices[i].z = (this.oz[i]*1000) -(Math.sin((this.count + this.or[i])/50 * Math.PI)*5);
-			geo.vertices[i].z = -(Math.sin(((i+this.count)/400)*Math.PI) * 10);
+			geo.vertices[i].z = -(Math.sin(((i+this.count)/400)*Math.PI) * this.guiControls.height);
 			
 			if(this.showGrid)
 			{
@@ -257,7 +273,7 @@ app.water = {
 			}
 		}
 		
-		this.count += 2;
+		this.count += this.guiControls.speed;
 		geo.verticesNeedUpdate = true;
 		
 		if(this.showGrid)
