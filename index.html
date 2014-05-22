@@ -16,11 +16,26 @@
 		margin          : 0;
 		overflow        : hidden;
 		background-color: #00F2D2;
+		font-family:Monospace;
+		font-size:13px;
+		text-align: center;
+	}
+	#info {
+		color: #fff;
+		position: absolute;
+		top: 0px; width: 100%;
+		padding: 5px;
+		z-index:100;
 	}
 	</style>
 </head>
 <body>
-
+<div id="info">
+	<p>In main - Click on the buttons to proceed to a different experience</p>
+	<p>In Water, Reflection, and Refraction use WASD to move and the mouse to look</p>
+	<p>In lizard hold and drag the mouse to move</p>
+	<p>refresh to restart</p>
+</div>
 <script id="vertexShader" type="x-shader/x-vertex">
 	varying vec2 vUv;
 	
